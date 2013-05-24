@@ -1,0 +1,17 @@
+<p align="right" style="font-family:Arial; size:12pt">
+	Cidade Universit&aacute;ria Zeferino Vaz, {$dia1} de {$mes3} de {$ano2}.</p>
+<p align="left" style="font-family:Arial; size:12pt">
+	<b>OF. CPO n&deg;: {$numero_ofi}/{$anoE}</b><br />
+	&Agrave; Unidade: {$unOrgDest_nome}<br />
+	Assunto: {$assunto}</p>
+<br />
+<br />
+<p align="left" style="font-family:Arial; size:12pt">
+	{$conteudo}</p>
+<div style="display: block; page-break-inside: avoid;">
+	<p align="center" style="font-family:Arial; size:12pt">
+		<br />
+		<b>{$Autor_descr} {$Autor_nomeCompl}</b><br />
+		{$Autor_cargo} CPO/Unicamp<br />
+		Matr. {$Autor_matricula}</p>
+</div>

@@ -1,0 +1,69 @@
+﻿html,body {
+
+	margin:0;
+	padding:0 0 0 0;
+	height:100%;
+	
+}
+#container {
+	min-height:100%;
+	position:relative;
+	width: 99%;
+	float: left;
+}
+#header {
+	/*background-image: url('../img/logocpo50.png');
+	//background-repeat: no-repeat;
+	//background-position: 10px 10px;*/
+	border-width: 0;
+	height: 40px;
+	width: 84%; 
+	text-align: center; 
+	padding:10px 10px 0px 10px;
+	
+}
+#conteudoDiv {
+	padding:10px;
+	padding-bottom: 45px;	/* Height of the footer */
+}
+#footer {
+	position:absolute;
+	bottom:0;
+	width:99%;
+	height:45px;			/* Height of the footer */
+}
+
+div.boxLeft, div.boxRight{ padding: 5px;}
+
+div.boxLeft{
+	clear: left;
+	float: left;
+	width: 11%;
+	margin-bottom: 30px;
+}
+
+div.boxRight{
+	margin-left: 12%;
+	width: 87%;
+	
+}
+
+div.boxLeftMenu{
+	border-width: 0;
+	border-color: #BE1010;
+	margin-bottom: 25px;
+}
+
+div.boxCont{
+	border-left-style: solid;
+	border-right-style: dotted;
+	border-top-style: dotted;
+	border-bottom-style: dotted;
+	border-width: 1px 1px 1px 5px;
+	border-color: #BE1010;
+	background-color: #E8E8E8;
+	width: 99%;
+	margin-top: 2px;
+	padding: 5px;
+	position: inherit;
+}

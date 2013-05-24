@@ -1,0 +1,148 @@
+body {
+	background-image: url('projetos-obras-site_img/bg.png');
+	font-family: Arial, Calibri, sans-serif;
+	font-size: 10pt;
+	margin:0;
+	padding:0 0 0 0;
+	height:100%;
+}
+
+td.topMenu:hover {
+	background-color: #DDDDDD;
+}
+
+td.topMenuActive {
+	background-color: #D0D0D0;
+}
+
+div.alert {
+	display: none;
+	border: 1px red solid;
+	padding: 3px;
+	margin: 3px;
+}
+
+div.cadDisp {padding: 5px;}
+
+input[type="button"],input[type="submit"],input[type="reset"]{
+	border: 1px solid white;
+	outline: 1px solid #A0A0A0;
+	color: white;
+	background-color: #A0A0A0;
+	display: inline;
+	font-weight: bold;
+	padding: 1px 3px 1px 3px;
+	cursor: pointer;
+	padding: 3px 15px;
+}
+
+input[type="button"]:hover,input[type="submit"]:hover,input[type="reset"]:hover{
+	background-color: #707070;
+	outline-color: #707070;
+}
+
+a{font-size: 10pt;text-decoration: none; color: #BE1010;}
+a:hover, a:active{text-decoration: underline;}
+
+table{margin: 0px; padding: 0px; border: 0px;font-size: 10pt;}
+tr{margin: 0px; padding: 0px; border: 0px;}
+td{margin: 0px; padding: 0px; border: 0px; vertical-align: top;}
+
+
+td.c,td.cc{border-style: dotted; border-width: 0 0 1px 0; border-color:#c0c0c0; padding: 5px;}
+td.cc{text-align: center;}
+td.vc{vertical-align: middle;}
+tr.c:hover{background-color: #F0F0F0;}
+
+font.hist{
+	display: block;
+	width: 100%;
+	padding: 5px 5px 0 5px;
+	font-size: 9pt;
+}
+
+div.subMenu1,div.subMenu2{
+	border-width: 0 0 0 2px;
+	border-style: solid;
+	border-color: #C3C3C3;
+	padding: 2px;
+}
+
+div.subMenu1{background-color: #d8d8d8;}
+div.subMenu2{background-color: #dddddd;}
+
+a.menuHeader,span.menuHeader{
+	color: #BE1010;
+	display:block;
+	font-size:12pt;
+	font-weight:bold;
+	background-color: #D4D4D4;
+	border: 1px solid #C3C3C3;
+	padding: 2px;
+}
+
+#ajuda{
+	border: 2px solid #BE1010;
+	position: fixed;
+	top: 5px;
+	right: 5px;
+	width: 25%;
+	display: none;
+	background-color: #F8F8F8;
+	z-index: 9999
+}
+
+span.pLink{color: #BE1010;}
+span.menuHeader:hover,span.menuHeader:active,span.pLink:hover,span.pLink:active,div.close{cursor: pointer; text-decoration: underline;}
+span.par,span.impar {display:block; text-align: right;}
+h1,h2,h3,h4,h5{ color: #BE1010; }
+span.header{color: #BE1010;text-align: center; display:block; font-size:12pt; font-weight:bold;}
+span.headerLeft{color: #BE1010;text-align: left; display:block; font-size:12pt; font-weight:bold; padding: 5px;}
+span.footer{text-align: left; font-size:10pt;}
+
+#container {
+	min-height:100%;
+	position:relative;
+	width: 100%;
+	float: left;
+}
+
+#header {
+	background-image: url('projetos-obras-site_img/logocpo50.png');
+	background-repeat: no-repeat;
+	background-position: 10px 10px;
+	border-width: 0;
+	height: 40px;
+	width: 84%; 
+	text-align: center;
+	padding:10px 10px 0px 15%;
+}
+
+#conteudo {
+	padding:10px;
+	padding-bottom: 45px;	/* Height of the footer */
+}
+
+#footer {
+	position:absolute;
+	bottom:0;
+	width:100%;
+	height:45px;			/* Height of the footer */
+}
+
+div.boxRight{
+	padding: 5px;
+	margin-left: 5%;
+	width: 90%;
+	
+}
+
+div.boxCont{
+	border-left-style: solid;
+	border-width: 0px 0px 0px 5px;
+	border-color: #BE1010;
+	background-color: #FFFFFF;
+	width: 100%;
+	margin-top: 2px;
+	padding: 5px;
+}

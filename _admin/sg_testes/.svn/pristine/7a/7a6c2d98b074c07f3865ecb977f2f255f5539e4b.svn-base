@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>SIGPOD :: MANUTENCAO</title>
+</head>
+<body>
+<p style="text-align: center;">
+	<span style="font-size:20px;">Administração SiGPOD</span></p>
+<p>
+	<span style="font-size:16px;"><strong>Índice</strong></span></p>
+<p>
+&nbsp;&nbsp;<a href="#1">1.  Arquivos do SiGPOD</a></p>
+<p>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#1.1">1.1. O arquivo conf.inc.php</a></p>
+<p>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#1.2">1.2. O arquivo senha.php</a></p>
+<p>
+&nbsp;&nbsp;<a href="#2">2. Apache e PHP</a></p>
+<p>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#2.1">2.1. Configurando o Apache</a></p>
+<p>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#2.2">2.2. Configurando o PHP</a></p>
+<p>
+&nbsp;&nbsp;<a href="#3">3. MySQL</a></p>
+<p>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#3.1">3.1. Instalando o MySQL</a></p>
+<p>
+&nbsp;&nbsp;&nbsp;<a href="#3.2">3.2. Instalando o PhpMyAdmin</a></p>
+<p>
+&nbsp;&nbsp;&nbsp;<a href="#3.3">3.3. Refazendo a sincronização</a></p>
+<p>
+&nbsp;&nbsp;<a href="#4">4. Configurações</a></p>
+<p>
+&nbsp;&nbsp;&nbsp;<a href="#4.1">4.1. Verificando configurações do servidor</a></p>
+<p>
+&nbsp;&nbsp;<a href="#5">5. Problemas Frequentes</a></p>
+<p>
+	 </p>
+<p>
+	<span style="font-size:16px;"><a name="1"></a>1. Arquivos do SiGPOD</span></p>
+<p>
+	Além dos arquivos de sistema, o SiGPOD é composto por alguns arquivos e pastas que variam de acordo com a instalação do programa. A seguir, uma descrição das pastas/arquivos do sistemas que eventualmente podem ser personalizadas:
+</p><p>
+	senha.php : contém os parâmetros para acesso ao Banco de Dados.
+</p><p>
+	config.inc.php : contém praticamente todas as configurações necessárias para executar o SiGPOD, como configurações do Banco de Dados, Active Directory, etc.
+</p><p>
+	/files/ : contém todos os arquivos salvos pelo SiGPOD (anexos e PDF de documentos gerados)</p>
+<p>
+	/img/obras/ : contém as imagens de obras enviadas no padrão XXXXXX-XX-XX/_imgDescricao(Y).jpg(onde XXXXXX-XX-XX é o código da obra e Y é a versão do arquivo de descrição.</p>
+<p>
+	/templates/ : contém os arquivos de modelo básicos tanto dos tipos de documentos (arquivos inciados por modelo_XXXX.html) quanto do layout padrão do SiGPOD (arquivos iniciados por template_XXXX.php).</p>
+<p>
+	<strong>    <a name="1.1"></a>1.1. O arquivo conf.inc.php</strong></p>
+<p>
+	Este arquivo contém todas as configurações necessárias para executar o SiGPOD corretamente. É formado basicamente por um array em que cada posição representa um parâmetro de configuração. De um modo geral, os valores que precisam mudados são:</p>
+<p>
+	<strong>$version </strong>: Versão atual do sistema - deve ser incrementada a cada modificação especialmente quando houver mudanças nos scripts em Java Script, para que os scripts antigos não sejam armazenados em cache.</p>
+<p>
+	variáveis de configuração do BD: Determinam o endereço da máquina (<strong>DBhost</strong>) e porta (<strong>DBport</strong>) servidora do Banco de dados assim como usuario, senha  (a serem definidos em senha.php) e o nome do banco de dados a ser utilizado (<strong>DBtable</strong>)</p>
+<p>
+	variáveis de configuração do adLDAP: Em geral, apenas <strong>accountSuffix</strong>, <strong>baseDn</strong>, <strong>domainControllers</strong>, <strong>adminUsername</strong>, <strong>adminPassword </strong>devem ser personalizados.</p>
+<p>
+	   <strong><a name="1.2"></a>1.2. O arquivo senha.php</strong></p>
+<p>
+	    <strong>$userBD</strong> : nome do usuario do banco de dados (padrão: sgcpo)<br />
+	    <strong>$baseBD </strong>:nome da base de dados em que as tabelas do sigpod estão armazenadas (padrão: sg)<br />
+	    <strong>$senhaBD</strong> : senha definida na inserção do usuário do BD (recomenda-se gerar uma senha aletória)</p>
+<p>
+	<span style="font-size:18px;"><span style="font-size:16px;"><a name="2"></a>2. Apache e PHP</span></span></p>
+<p>
+	O SiGPOD é um software para a web. Para tanto necessita de um programa servidor de requisições HTTP para funcionar corretamente como o Apache HTTP Server (<a href="http://httpd.apache.org/">http://httpd.apache.org/</a>).</p>
+<p>
+	<strong><a name="2.1"></a>2.1. Configurando o Apache</strong></p>
+<p>
+	Basicamente, os detalhes aos quais deve-se prestar atenção ao configurar o Apache são:</p>
+<p>
+	    a) Os arquivos do SiGPOD devem estar dentro da pasta <em>htdocs </em>do apache ou daquela especificada em <strong>DocumentRoot </strong>do arquivo httpd.conf</p>
+<p>
+	    b) O arquivo conf/extra/vhosts.conf deve estar configurado para redirecionar as requisições (ver exemplo <a href="exemplo_vhosts.html">aqui</a>)</p>
+<p>
+	<strong><a name="2.2"></a>2.2 Configurando o PHP</strong></p>
+<p>
+	Para que os arquivos .php sejam corretamente interpretados, é necessário possuir o PHP devidamente instalado na máquina. Para isso, deve-se baixar os arquivos em (<a href="http://windows.php.net/download">http://windows.php.net/download</a>) versão ZIP Non-thread safe</p>
+<p>
+	Para fazer o PHP se comunicar com o Apache, é necessário instalar o PHP como módulo do Apache ou fazer o Apache executá-lo toda vez que um arquivo .php for requisitado. (Veja um exemplo <a href="httpd.conf.html">aqui</a>)</p>
+<p>
+	Além disso, é necessário que algumas configurações do PHP sejam feitas caso a instalação seja feita do zero. Algumas variáveis importantes e seus valores podem ser encontradas <a href="php.ini.html">aqui</a>.</p>
+<p>
+	<span style="font-size:18px;"><a name="3"></a>3. MySQL</span></p>
+<p>
+	Para que os dados entrados pelos usuários possa persistir, o SiGPOD utiliza o MySQL para gerenciar seus bancos de dados. O instalador pode ser encontrado em (<a href="http://www.mysql.com/downloads/mysql/">http://www.mysql.com/downloads/mysql/</a>).</p>
+<p>
+	<strong><a name="3.1"></a>3.1. Instalando o MySQL</strong></p>
+<p>
+	Ao instalar o MySQL deve-se prestar atenção na porta em que o serviço será instalado, configurar uma senha para o usuário root e adicionar um usuário (configurado no conf.inc.ini do SiGPOD) para o SiGPOD.</p>
+<p>
+	O arquivo my.ini também deve ser configurado para que a replicação funcione. Veja como <a href="exemplo_replicacao.html">aqui</a>.</p>
+<p>
+	<strong><a name="3.2"></a>3.2. Instalando o PhpMyAdmin</strong></p>
+<p>
+	Para instalar o PhpMyAdmin basta descompactar o arquivo zip dentro do <strong>htdocs </strong>ou do diretório especificado em <strong>DocumentRoot</strong> disponivel em <a href="http://www.phpmyadmin.net/home_page/downloads.php">http://www.phpmyadmin.net/home_page/downloads.php</a></p>
+<p>
+	<strong><a name="3.3"></a>3.3. Refazendo a sincronização</strong></p>
+<p>
+	Embora não seja obrigatório, é altamente recomendável ter uma cópia dos dados em  duas máquinas distintas para caso uma das máquinas seja perdida, por exemplo. Desse modo, siga <a href="exemplo_replicacao.html">esses passos</a> para configurar a replicação.</p>
+<p>
+	<span style="font-size:18px;"><a name="4"></a>4. Configurações</span></p>
+<p>
+	    <a name="4.1"></a>4.1 Verificando as configurações do servidor.<a href="verifica_instalacao.php">Verificar</a></p>
+<p></p>
+<p>
+	<span style="font-size:18px;"><a name="5"></a>5. Perguntas Frequentes</span></p>
+<p>
+	 </p>
+</body>
+</html>

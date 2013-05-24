@@ -1,0 +1,141 @@
+<style type="text/css">
+body,tr,td,div{
+font-size:10pt; font-family:Arial;
+}
+</style>
+
+<div style="border: 1px solid black; padding: 0; margin: 0; width: 100%; font-size:10pt; font-family:Arial; ">
+	<center><span style="font-size: 14pt; font-weight: bold;">CPO - Coordenadoria de Projeto e Obras</span></center>
+	<br /><br />
+	<span style="font-size: 15pt; font-weight: bold; text-align: right">CONTROLE INTERNO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N&deg;: {$id}/{$ano2}</span>
+	<table style="border: 0; width:100%">
+		<tr>
+			<td style="border: 1px solid black; width: 20%;">Un/&oacute;rg refer&ecirc;ncia:</td>
+			<td style="border: 1px solid black; width: 25%;">&nbsp;</td>
+			<td style="width: 5%;"></td>
+			<td rowspan="2" style="vertical-align:middle; border: 1px solid black; width: 10%;">DOC</td>
+			<td style="border: 1px solid black; width: 15%;">N&deg; OF:</td>
+			<td style="border: 1px solid black; width: 25%;">&nbsp;</td>
+		</tr>
+		<tr>
+			<td style="border: 1px solid black;">Data receb. na &Aacute;REA:</td>
+			<td style="border: 1px solid black;">&nbsp;</td>
+			<td style=""></td>
+			<td style="border: 1px solid black;">N&deg; PROC:</td>
+			<td style="border: 1px solid black;">&nbsp;</td>
+		</tr>
+		<tr>
+			<td style="border: 1px solid black;">Tipo de CI:</td>
+			<td style="border: 1px solid black;">&nbsp;</td>
+			<td style=""></td>
+			<td style="border: 1px solid black;">OUTRO:</td>
+			<td colspan="2" style="border: 1px solid black;">&nbsp;</td>
+		</tr>
+		<tr>
+			<td style="border: 1px solid black;">Respons&aacute;vel:</td>
+			<td style="border: 1px solid black;">&nbsp;</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		
+		<tr>
+			<td colspan="6" style="border: 1px solid black;"><b>Obra/Servi&ccedil;o:</b><br /><br /></td>
+		</tr>
+		<tr>
+			<td colspan="6" style="border: 1px solid black;"><b>Diretrizes para esta CI:</b><br /><br /><br /></td>
+		</tr>
+	</table>
+	<br />
+	<table style="border: 0; width:100%">
+			<tr>
+			<td colspan="4"><center><b>ANDAMENTO</b></center></td>
+		</tr>
+		<tr>
+			<td style="border: 1px solid black; text-align:center; width: 60%;">A&Ccedil;&Otilde;ES</td>
+			<td style="border: 1px solid black; text-align:center; width: 15%">PARA</td>
+			<td style="border: 1px solid black; text-align:center; width: 10%'">DATA RECEB</td>
+			<td style="border: 1px solid black; text-align:center; width: 15%">VISTO RECEB</td>
+		</tr>
+		<tr>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">1- {$despacho1}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">{$para1}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">{$data1}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">&nbsp;</td>
+		</tr>
+		<tr>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">2-  {$despacho2}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">{$para2}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">{$data2}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">&nbsp;</td>
+		</tr>
+		<tr>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">3-  {$despacho3}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">{$para3}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">{$data3}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">&nbsp;</td>
+		</tr>
+		<tr>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">4-  {$despacho4}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">{$para4}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">{$data4}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">&nbsp;</td>
+		</tr>
+		<tr>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">5-  {$despacho5}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">{$para5}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">{$data5}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">&nbsp;</td>
+		</tr>
+		<tr>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">6-  {$despacho6}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">{$para6}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">{$data6}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">&nbsp;</td>
+		</tr>
+		<tr>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">7-  {$despacho7}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">{$para7}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">{$data7}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">&nbsp;</td>
+		</tr>
+		<tr>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">8-  {$despacho8}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">{$para8}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">{$data8}</td>
+			<td style="border: 1px solid black; height: 60px; vertical-align: top;">&nbsp;</td>
+		</tr>
+	</table>
+	
+	<table style="border: 0; width:100%">
+		<tr>
+			<td colspan="2" style="border: 1px solid black;"><b>Documentos Vinculados:</b></td>
+			<td rowspan="6" style="border: 1px solid black; width:65%;">OBS.:</td>
+		</tr>
+		<tr>
+			<td style="border: 1px solid black; width: 10%;">CI(s):</td>
+			<td style="border: 1px solid black; width: 25%;">&nbsp;</td>
+		</tr>
+		<tr>
+			<td style="border: 1px solid black;">Inform N&deg;:</td>
+			<td style="border: 1px solid black;">&nbsp;</td>
+		</tr>
+		<tr>
+			<td style="border: 1px solid black;">Memor.:</td>
+			<td style="border: 1px solid black;">&nbsp;</td>
+		</tr>
+		<tr>
+			<td style="border: 1px solid black;">Processo:</td>
+			<td style="border: 1px solid black;">&nbsp;</td>
+		</tr>
+		<tr>
+			<td style="border: 1px solid black;">&nbsp;</td>
+			<td style="border: 1px solid black;">&nbsp;</td>
+		</tr>
+		<tr>
+			<td colspan="2" style="border: 1px solid black;">Desenho: <br /></td>
+			<td style="border: 1px solid black;"><br />Ecam. para: </td>
+		</tr>
+	</table>
+</div> 

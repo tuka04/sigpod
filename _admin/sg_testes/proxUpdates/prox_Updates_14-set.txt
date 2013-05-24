@@ -1,0 +1,15 @@
+ALTER TABLE  `label_doc` ADD  `buscavel` INT( 1 ) NOT NULL DEFAULT  '1' AFTER  `acoes`;
+
+INSERT INTO `label_doc` (`nome`, `nomeAbrv`, `campos`, `emitente`, `numeroComp`, `cadAcaoID`, `novoAcaoID`, `verAcaoID`, `despAcaoID`, `tabBD`, `campoIndice`, `campoBusca`, `acoes`, `buscavel`, `obra`, `empresa`, `docAnexo`, `docResp`, `formulario`, `template`) VALUES
+('Registro de Entrada de Protocolo', 'rep', 'numero_rep,num_proc_rep,obra_rep,empresa_rep,cont_rep', 'numero_rep', 'numero_rep', 0, 0, 55, 0, 'doc_rep', '', 'numero_rep', '', 0, 0, 0, 0, 0, '', '');
+
+INSERT INTO  `label_campo` (`id` ,`nome` ,`label` ,`tipo` ,`attr` ,`extra` ,`verAcao` ,`editarAcao` ,`tooltip`) VALUES (NULL ,  'numero_rep',  'Reg. de Entrada (Cod de barras, se houver)',  'input',  'type="text" size="10" maxlength="15"',  '',  '0',  '0', NULL);
+
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`, `tooltip`) VALUES (NULL, 'cont_rep', 'Documentos a serem cadastrados:', 'cont_rep', '', '', '0', '0', NULL);
+
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`, `tooltip`) VALUES (NULL, 'num_proc_rep', 'N&uacute;mero do Processo', 'input', 'type="text" class="noedit" readonly="readonly" style="width:100%"', '', '0', '0', NULL);
+
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`, `tooltip`) VALUES (NULL, 'obra_rep', 'Obra', 'input', 'type="text" class="noedit" readonly="readonly" style="width:100%"', '', '0', '0', NULL);
+
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`, `tooltip`) VALUES (NULL, 'empresa_rep', 'Empresa', 'input', 'type="text" class="noedit" readonly="readonly" style="width:100%"', '', '0', '0', NULL);
+

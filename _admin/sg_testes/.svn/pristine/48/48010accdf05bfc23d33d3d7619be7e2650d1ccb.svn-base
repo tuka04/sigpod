@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Replicacao do Banco de Dados</title>
+</head>
+<body>
+    <b>Resumo dos passos:</b><br />
+    1. Edição do my.ini<br />
+    2. Obtenção de dump e posição do log<br />
+    3. Importação de dump e configuração do servidor master dentro do slave<br/>
+    
+    <p><b>1. Edição do my.ini</b></p>
+    No master e slave:<br />
+    Na seção [mysqld] adicione as seguintes linhas:
+    <pre>
+	log-bin=mysql-bin
+	server-id=&lt;identificador unico&gt;
+	</pre>
+	Onde &lt;identificador unico&gt; é um número qualquer mas único para cada máquina.
+    <p><b>2. Obtenção de dump e posição do log</b></p>
+    Idealmente, deve-se obter uma cópia de segurança dos dados já armazenados no servidor para que sejam replicados a partir de
+    uma exata posição do log. O problema é que a posição do log deve ser correspondente ao dump da base de dados, o que é complicado já que não
+    se pode garantir que entre a amostragem do log e a cópia dos dados nenhum registro será inserido ou modificado. Para minimizar esse risco (ou pelo menos facilitar
+    a recuperação se esse evento acontecer) segue-se a rotina abaixo:
+    <br />
+    
+    2.1. Abrir duas janelas do PhpMyAdmin do servidor master<br />
+    2.2. Em umas delas digitar o seguinte comando SQL:
+    <pre>
+    FLUSH TABLES WITH READ LOCK;
+    SHOW MASTER LOG;
+    </pre>
+    2.3. Guarde o valor de File e Position.<br />
+    2.4. Na segunda janela, clique em exportar e exporte todas as bases de dados. Faça o download do arquivo de dump.<br />
+    2.5. Libere a trava do Banco de dados:
+    <pre>
+    UNLOCK TABLES
+    </pre>
+    
+    <p><b>3. Importação de dump e configuração do servidor master dentro do slave</b></p>
+    3.1. Selecione "Importar" BD slave.<br />
+    3.2. Selecione o arquivo e importe os dados.<br />
+    3.3. Abra a aba SQL e configure o servidor master:<br />
+    <pre>
+    CHANGE MASTER TO
+    	MASTER_HOST = '(endereço do master)',
+    	MASTER_USER = '(nome de usuario no BD master com privilégios de replication slave)',
+    	MASTER_PASSWORD = '(senha do referido usuario)',
+    	MASTER_LOG_FILE = '(valor de File guardado do master)',
+    	MASTER_LOG_POS = '(valor de position guardado do master)';
+    START SLAVE;
+    </pre>
+    3.4. Acesse a aba replicação e verifique se ela está rodando normalmente.<br />
+    3.5. Selecione "Skip next 1 instructions" e "full restart" caso encontre algum erro.
+    
+    
+</body>
+</html>

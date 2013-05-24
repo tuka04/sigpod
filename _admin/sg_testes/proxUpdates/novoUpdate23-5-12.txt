@@ -1,0 +1,352 @@
+ALTER TABLE `label_obra_fase` DROP `etapaID`;
+ALTER TABLE `label_obra_fase` DROP `fasedocID`;
+ALTER TABLE `label_obra_fase` DROP `faseID`;
+ALTER TABLE  `label_obra_fase` ADD  `tabBD` VARCHAR( 50 ) NOT NULL;
+ALTER TABLE `obra_fase` DROP `fasedocID`;
+ALTER TABLE `obra_fase` DROP `docID`;
+ALTER TABLE `obra_fase` DROP `etapatipoID`;
+ALTER TABLE  `obra_fase` ADD  `enabled` BOOLEAN NOT NULL AFTER  `etapaID` ,
+ADD  `responsavelID` INT( 10 ) NOT NULL AFTER  `enabled` ,
+ADD  `concluido` BOOLEAN NOT NULL AFTER  `responsavelID`;
+UPDATE  `label_obra_etapa` SET  `nome` =  'Planejamento' WHERE  `label_obra_etapa`.`id` =1;
+UPDATE  `label_obra_etapa` SET  `nome` =  'Projeto' WHERE  `label_obra_etapa`.`id` =2;
+UPDATE  `label_obra_etapa` SET  `nome` =  'Execu&ccedil;&atilde;o' WHERE  `label_obra_etapa`.`id` =3;
+UPDATE  `label_obra_fase` SET  `nome` =  'Planta de Implanta&ccedil;&atilde;o' WHERE  `label_obra_fase`.`id` =1;
+UPDATE  `label_obra_fase` SET  `nome` =  'Doc. de Estudo Inicial' WHERE  `label_obra_fase`.`id` =2;
+UPDATE  `label_obra_fase` SET  `nome` =  'An&aacute;lise Ambiental' WHERE  `label_obra_fase`.`id` =3;
+UPDATE  `label_obra_fase` SET  `nome` =  'Levantamento de Dados / Programa de Necessidades' WHERE  `label_obra_fase`.`id` =4;
+UPDATE  `label_obra_fase` SET  `nome` =  'Levantamento de Campo' WHERE  `label_obra_fase`.`id` =5;
+INSERT INTO  `label_obra_fase` (`id`, `nome`, `tabBD`) VALUES (NULL , 'Prefeitura', '');
+INSERT INTO `label_obra_fase` (`id`, `nome`, `tabBD`) VALUES (NULL, 'Aprova&ccedil;&atilde;o Usu&aacute;rio', '');
+INSERT INTO `label_obra_fase` (`id`, `nome`, `tabBD`) VALUES (NULL, 'Informa&ccedil;&otilde;es T&eacute;cnicas Suplementares', '');
+ALTER TABLE  `label_obra_etapa` ADD  `refObra` INT( 1 ) NOT NULL;
+ALTER TABLE  `label_obra_etapa` ADD  `refEmpreend` INT( 1 ) NOT NULL;
+UPDATE  `label_obra_etapa` SET  `refEmpreend` =  '1' WHERE  `label_obra_etapa`.`id` =1;
+UPDATE  `label_obra_etapa` SET  `refObra` =  '1' WHERE  `label_obra_etapa`.`id` =2;
+UPDATE  `label_obra_etapa` SET  `refObra` =  '1' WHERE  `label_obra_etapa`.`id` =3;
+ALTER TABLE  `label_obra_fase` ADD  `etapaID` INT( 10 ) NOT NULL;
+UPDATE `label_obra_fase` SET `etapaID`=1 WHERE 1;
+ALTER TABLE  `obra_fase` CHANGE  `faseID`  `tipoID` INT( 10 ) NOT NULL;
+ALTER TABLE  `obra_fase` CHANGE  `tipoID`  `labelID` INT( 10 ) NOT NULL;
+ALTER TABLE  `obra_fase` ADD  `tipoID` INT( 10 ) NOT NULL AFTER  `labelID`;
+CREATE TABLE IF NOT EXISTS `obra_fase_campo` (
+  `faseID` int(10) NOT NULL,
+  `campoID` int(10) NOT NULL,
+  PRIMARY KEY (`faseID`,`campoID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE IF NOT EXISTS `label_campo_fase` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(50) NOT NULL,
+  `tipo` varchar(20) NOT NULL,
+  `tamanho` int(10) NOT NULL DEFAULT '0',
+  `atribEspeciais` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+INSERT INTO `label_campo_fase` (`id`, `nome`, `tipo`, `tamanho`, `atribEspeciais`) VALUES (NULL, 'Anexar Planta de Implanta&ccedil;&atilde;o', 'file', '0', NULL);
+INSERT INTO `label_campo_fase` (`id`, `nome`, `tipo`, `tamanho`, `atribEspeciais`) VALUES (NULL, 'Observa&ccedil;&otilde;es', 'textarea', '0', NULL);
+INSERT INTO `obra_fase_campo` (`faseID`, `campoID`) VALUES ('1', '1');
+INSERT INTO `obra_fase_campo` (`faseID`, `campoID`) VALUES ('1', '2');
+ALTER TABLE  `label_campo_fase` ADD  `nomeAbrv` VARCHAR( 20 ) NOT NULL AFTER  `nome`;
+UPDATE  `label_campo_fase` SET  `nomeAbrv` =  'planta' WHERE  `label_campo_fase`.`id` =1;
+UPDATE  `label_campo_fase` SET  `nomeAbrv` =  'obs' WHERE  `label_campo_fase`.`id` =2;
+CREATE TABLE IF NOT EXISTS `plan_plantaimpl` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `planta` text NOT NULL,
+  `obs` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+UPDATE  `label_obra_fase` SET  `tabBD` =  'plan_plantaimpl' WHERE  `label_obra_fase`.`id` =1;
+ALTER TABLE  `label_obra_etapa` ADD  `somenteCPO` INT( 1 ) NOT NULL;
+ALTER TABLE  `obra_etapa` ADD  `enabled` INT( 1 ) NOT NULL;
+ALTER TABLE  `obra_fase` ADD  `somenteCPO` INT( 1 ) NOT NULL AFTER  `enabled`;
+DELETE FROM label_obra_fase WHERE id = 8;
+DELETE FROM `obra_fase_campo` WHERE faseID = 1 AND campoID = 2;
+DELETE FROM `label_campo_fase` WHERE id = 2;
+INSERT INTO `label_campo_fase` (`id`, `nome`, `nomeAbrv`, `tipo`, `tamanho`, `atribEspeciais`) VALUES (NULL, 'Planta Altim&eacute;tica Cadastral', 'plantaArit', 'file', '0', NULL);
+ALTER TABLE `label_campo_fase` CHANGE  `nome`  `nome` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
+INSERT INTO `label_campo_fase` (`id`, `nome`, `nomeAbrv`, `tipo`, `tamanho`, `atribEspeciais`) VALUES (NULL, 'Planta do Sistema de Dist. de Energia El&eacute;trica / P&acute;tio de Manobras Contemplando &aacute;reas de Entorno e demarca&ccedil;&atilde;o do Empreendimento', 'plantaEletr', 'file', '0', NULL);
+INSERT INTO `label_campo_fase` (`id`, `nome`, `nomeAbrv`, `tipo`, `tamanho`, `atribEspeciais`) VALUES (NULL, 'Sondagem do Subsolo', 'sondagem', 'file', '0', NULL);
+INSERT INTO `label_campo_fase` (`id`, `nome`, `nomeAbrv`, `tipo`, `tamanho`, `atribEspeciais`) VALUES (NULL, 'Relat&oacute;rio Fotogr&aacute;fico', 'relatorioFoto', 'file', '0', NULL);
+INSERT INTO `label_campo_fase` (`id`, `nome`, `nomeAbrv`, `tipo`, `tamanho`, `atribEspeciais`) VALUES (NULL, 'No Local da Obra, h&aacute; material com Amianto ?', 'amianto', 'yesno', '0', NULL);
+INSERT INTO `obra_fase_campo` (`faseID`, `campoID`) VALUES ('5', '3'), ('5', '4');
+INSERT INTO `obra_fase_campo` (`faseID`, `campoID`) VALUES ('5', '5'), ('5', '6');
+INSERT INTO `obra_fase_campo` (`faseID`, `campoID`) VALUES ('5', '7');
+CREATE TABLE IF NOT EXISTS `obra_fase_obs` (
+  `faseID` int(10) NOT NULL,
+  `campoID` int(10) NOT NULL,
+  `obs` TEXT NOT NULL,
+  PRIMARY KEY (`faseID`,`campoID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+ALTER TABLE  `plan_plantaimpl` CHANGE  `planta`  `planta` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL;
+ALTER TABLE `plan_plantaimpl` DROP `obs`;
+INSERT INTO `label_campo_fase` (`id`, `nome`, `nomeAbrv`, `tipo`, `tamanho`, `atribEspeciais`) VALUES (8, 'Documento de Informa&ccedil;&atilde;o T&eacute;cnica', 'docID', 'doc', '0', 'it');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (NULL, 'emitenteIT', 'Emitente', 'userID', '', 'current_user', '0', '0');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (NULL, 'numeroIT', 'N&uacute;mero da I.T.', 'autoincrement', '', 'current_year', '0', '0');
+INSERT INTO `label_acao` (`id`, `nome`, `abrv`) VALUES (82, 'Editar conteudo', 'edt_cont');
+INSERT INTO `label_acao` (`id`, `nome`, `abrv`) VALUES (83, 'Ver I.T.', 'ver');
+INSERT INTO `label_acao` (`id`, `nome`, `abrv`) VALUES (84, 'Despachar I.T.', 'desp');
+INSERT INTO `label_doc` (`id`, `nome`, `nomeAbrv`, `campos`, `emitente`, `numeroComp`, `cadAcaoID`, `novoAcaoID`, `verAcaoID`, `despAcaoID`, `tabBD`, `campoIndice`, `campoBusca`, `acoes`, `obra`, `empresa`, `docAnexo`, `docResp`, `formulario`, `template`) VALUES ('9', 'Informa&ccedil;&atilde;o T&eacute;cnica', 'it', 'numeroIT,anoE,unOrgDest,emitenteIT,assunto,conteudo', 'emitenteIT', 'numeroIT,anoE', '0', '0', '83', '84', 'doc_it', '', 'numeroIT,anoE', '', '0', '0', '1', '0', '', 'modelo_it.html');
+CREATE TABLE IF NOT EXISTS `plan_docestudoinicial` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `docID` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+CREATE TABLE IF NOT EXISTS `plan_aprovacaousuario` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `docID` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+CREATE TABLE IF NOT EXISTS `plan_docprefeitura` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `docID` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+CREATE TABLE IF NOT EXISTS `plan_analiseambiental` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `docID` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+INSERT INTO `obra_fase_campo` (`faseID`, `campoID`) VALUES ('2', '8');
+INSERT INTO `obra_fase_campo` (`faseID`, `campoID`) VALUES ('3', '8');
+INSERT INTO `obra_fase_campo` (`faseID`, `campoID`) VALUES ('6', '8');
+INSERT INTO `obra_fase_campo` (`faseID`, `campoID`) VALUES ('7', '8');
+UPDATE  `label_obra_fase` SET  `tabBD` =  'plan_docestudoinicial' WHERE  `label_obra_fase`.`id` =2;
+UPDATE  `label_obra_fase` SET  `tabBD` =  'plan_docprefeitura' WHERE  `label_obra_fase`.`id` =6;
+UPDATE  `label_obra_fase` SET  `tabBD` =  'plan_aprovacaousuario' WHERE  `label_obra_fase`.`id` =7;
+UPDATE  `label_obra_fase` SET  `tabBD` =  'plan_analiseambiental' WHERE  `label_obra_fase`.`id` =3;
+CREATE TABLE IF NOT EXISTS `doc_it` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `numeroIT` int(10) NOT NULL,
+  `anoE` int(4) NOT NULL,
+  `unOrgDest` varchar(250) NOT NULL,
+  `emitenteIT` int(10) NOT NULL,
+  `assunto` text NOT NULL,
+  `conteudo` text NOT NULL,
+  `documento` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+UPDATE  `label_doc` SET  `numeroComp` =  'numeroIT+/+anoE' WHERE  `label_doc`.`id` =9;
+UPDATE  `label_doc` SET  `acoes` =  '57,84,60,59' WHERE  `label_doc`.`id` =9;
+ALTER TABLE  `obra_rec` ADD  `justificativa` TEXT NULL;
+UPDATE  `label_doc` SET  `acoes` =  '57,84,60,59' WHERE  `label_doc`.`id` =9;
+INSERT INTO `label_acao` (`id`, `nome`, `abrv`) VALUES (85, 'Cadastrar Contrato', 'cadContr');
+UPDATE  `label_doc` SET  `acoes` =  '57,85,35,60,59' WHERE  `label_doc`.`id` =1;
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (NULL, 'numeroContr', 'N&uacute;mero do Contrato', 'autoincrement', '', '', '0', '0');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (NULL, 'numProcContr', 'N&uacute;mero do Processo', 'input', '', 'proc_contrato', '0', '0');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (NULL, 'contrRec', 'Origem dos Recursos', '', '', 'contrRec', '0', '0');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (NULL, 'contrObrasProj', 'Obras/Projetos', '', '', 'contrObrasProj', '0', '0');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (NULL, 'valorProj', 'Valor do Projeto', 'input', '', 'aditivo', '0', '0');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (NULL, 'valorMaoObra', 'Valor de M&atilde;o-de-Obra', 'input', '', 'aditivo', '0', '0');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (NULL, 'valorMaterial', 'Valor do Material', 'input', '', 'aditivo', '0', '0');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (NULL, 'dataAssinatura', 'Data de Assinatura', 'data', '', '', '0', '0');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (NULL, 'valorTotal', 'Valor Total', 'label', '', '', '0', '0');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (NULL, 'prazoContr', 'Prazo Contratual', 'data', '', 'aditivo', '0', '0');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (NULL, 'vigenciaContr', 'Vig&ecirc;ncia Contratual', 'input', '', '', '0', '0');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (NULL, 'inicioProjObra', 'In&iacute;cio Projeto/Obra', 'data', '', 'aditivo', '0', '0');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (NULL, 'prazoProjObra', 'Prazo Projeto/Obra', 'data', '', 'aditivo', '0', '0');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (NULL, 'dataTermino', 'T&eacute;rmino Previsto', 'label', '', '', '0', '0');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (NULL, 'recursosOrc', 'Recursos Or&ccedil;ament&aacute;rios', 'input', '', '', '0', '0');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (NULL, 'elemEconomico', 'Elemento Econ&ocirc;mico', 'input', '', '', '0', '0');
+INSERT INTO `label_acao` (`id`, `nome`, `abrv`) VALUES ('86', 'Ver Contrato', 'ver');
+INSERT INTO `label_doc` (`id`, `nome`, `nomeAbrv`, `campos`, `emitente`, `numeroComp`, `cadAcaoID`, `novoAcaoID`, `verAcaoID`, `despAcaoID`, `tabBD`, `campoIndice`, `campoBusca`, `acoes`, `obra`, `empresa`, `docAnexo`, `docResp`, `formulario`, `template`) VALUES (NULL, 'Contrato', 'contr', 'numeroContr,anoE,numProcContr,unOrg,contrRec,contrObrasProj,valorProj,valorMaoObra,valorMaterial,dataAssinatura,valorTotal,prazoContr,vigenciaContr,inicioProjObra,dataTermino,recursosOrc,elemEconomico', 'unOrg', 'unOrg+numeroContr+/+anoE', '0', '0', '86', '0', 'doc_contrato', '', 'unOrg,numeroContr,anoE', '', '0', '0', '0', '0', '', '');
+INSERT INTO label_acao (id, nome, abrv) VALUES ('21', 'Adicionar Recurso em Empreendimento', 'addRec');
+INSERT INTO `permissoes` (`grupoID` ,`acaoID` ,`permissao`) VALUES ('1',  '21',  '0'), ('2',  '21',  '1'), ('3',  '21',  '0'), ('4',  '21',  '1'), ('5',  '21',  '0'), ('6',  '21',  '0'), ('7',  '21',  '0');
+CREATE TABLE IF NOT EXISTS `doc_contrato` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `numeroContr` int(5) DEFAULT NULL,
+  `anoE` int(4) DEFAULT NULL,
+  `numProcContr` int(11) NOT NULL,
+  `unOrg` varchar(50) NOT NULL,
+  `valorProj` double NOT NULL,
+  `valorMaoObra` double NOT NULL,
+  `valorMaterial` double NOT NULL,
+  `dataAssinatura` int(11) NOT NULL,
+  `prazoContr` int(11) NOT NULL,
+  `inicioProjObra` int(11) NOT NULL,
+  `dataTermino` int(11) NOT NULL,
+  `recursosOrc` text NOT NULL,
+  `elemEconomico` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+UPDATE `label_doc` SET  `campoBusca` =  'numProcContr,unOrg,numeroContr,anoE' WHERE  `label_doc`.`id` =10;
+UPDATE  `label_campo` SET  `attr` =  'type="text"' WHERE  `label_campo`.`id` =69;
+UPDATE  `label_campo` SET  `attr` =  'type="text"' WHERE  `label_campo`.`id` =70;
+UPDATE  `label_campo` SET  `attr` =  'type="text"' WHERE  `label_campo`.`id` =79;
+UPDATE  `label_campo` SET  `attr` =  'type="text"' WHERE  `label_campo`.`id` =80;
+UPDATE  `label_campo` SET  `tipo` =  'label' WHERE  `label_campo`.`id` =71;
+UPDATE  `label_doc` SET  `campos` =  'numProcContr,numeroContr,anoE,unOrg,contrRec,contrObrasProj,valorProj,valorMaoObra,valorMaterial,valorTotal,dataAssinatura,prazoContr,vigenciaContr,inicioProjObra,dataTermino,recursosOrc,elemEconomico' WHERE  `label_doc`.`id` =10;
+UPDATE  `label_campo` SET  `tipo` =  'contrRec', `extra` =  '' WHERE  `label_campo`.`id` =67;
+UPDATE  `label_campo` SET  `tipo` =  'contrObrasProj',`extra` =  '' WHERE  `label_campo`.`id` =68;
+UPDATE  `label_campo` SET  `tipo` =  'input' WHERE  `label_campo`.`id` =71;
+UPDATE  `label_campo` SET  `tipo` =  'data' WHERE  `label_campo`.`id` =72;
+UPDATE  `label_campo` SET  `tipo` =  'input' WHERE  `label_campo`.`id` =73;
+UPDATE  `label_campo` SET  `tipo` =  'input' WHERE  `label_campo`.`id` =78;
+UPDATE  `label_campo` SET  `attr` =  'type="text"' WHERE  `label_campo`.`id` =71 OR id=73 OR id=75 OR id=78 ;
+UPDATE  `label_campo` SET  `tipo` =  'input' WHERE  `label_campo`.`id` =74;
+UPDATE  `label_campo` SET  `attr` =  'type="text"' WHERE  `label_campo`.`id` =74;
+UPDATE  `label_doc` SET  `campos` =  'numProcContr,numeroContr,anoE,unOrg,contrRec,contrObrasProj,valorProj,valorMaoObra,valorMaterial,valorTotal,dataAssinatura,prazoContr,vigenciaContr,inicioProjObra,prazoProjObra,dataTermino,recursosOrc,elemEconomico' WHERE `label_doc`.`id` =10;
+ALTER TABLE  `doc_contrato` ADD  `prazoProjObra` INT( 11 ) NOT NULL AFTER  `inicioProjObra`;
+UPDATE  `label_doc` SET  `campos` =  'numProcContr,numeroContr,anoE,unOrg,valorProj,valorMaoObra,valorMaterial,valorTotal,dataAssinatura,prazoContr,vigenciaContr,inicioProjObra,prazoProjObra,dataTermino,recursosOrc,elemEconomico' WHERE `label_doc`.`id` =10;
+ALTER TABLE  `doc_contrato` ADD  `valorTotal` DOUBLE NOT NULL AFTER  `valorMaterial`;
+ALTER TABLE  `doc_contrato` ADD  `vigenciaContr` INT( 11 ) NOT NULL AFTER  `prazoContr`;
+UPDATE  `label_campo` SET  `tipo` =  'data' WHERE  `label_campo`.`id` =75;
+UPDATE  `label_campo` SET  `tipo` =  'data' WHERE  `label_campo`.`id` =78;
+UPDATE  `label_campo` SET  `extra` =  'noDatePicker' WHERE  `label_campo`.`id` =75;
+UPDATE  `label_campo` SET  `extra` =  'noDatePicker' WHERE  `label_campo`.`id` =78;
+CREATE TABLE IF NOT EXISTS `obra_contrato` (
+  `contratoID` int(11) NOT NULL,
+  `obraID` int(11) NOT NULL,
+  PRIMARY KEY (`contratoID`,`obraID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE IF NOT EXISTS `obra_contrato_recurso` (
+  `contratoID` int(11) NOT NULL,
+  `recursoID` int(11) NOT NULL,
+  PRIMARY KEY (`contratoID`,`recursoID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+UPDATE  `label_campo` SET  `tipo` =  'input', `extra` =  '' WHERE  `label_campo`.`id` =78;
+UPDATE  `label_campo` SET  `tipo` =  'data', `extra` =  'noDatePicker' WHERE  `label_campo`.`id` =78;
+ALTER TABLE  `obra_contrato_recurso` ADD  `valor` DOUBLE NOT NULL DEFAULT  '0';
+UPDATE  `label_campo` SET  `extra` =  'aditivo noDatePicker' WHERE  `label_campo`.`id` =77;
+UPDATE  `label_campo` SET  `tipo` =  'input', `attr` =  'type="text"' WHERE  `label_campo`.`id` =77;
+ALTER TABLE  `doc_contrato` CHANGE  `unOrg`  `unOrg` VARCHAR( 250 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
+UPDATE  `label_doc` SET  `numeroComp` =  'unOrg+ +numeroContr+/+anoE' WHERE  `label_doc`.`id` =10;
+UPDATE  `label_campo` SET  `editarAcao` =  '-1' WHERE  `label_campo`.`id` =66;
+INSERT INTO `label_campo_fase` (`id`, `nome`, `nomeAbrv`, `tipo`, `tamanho`, `atribEspeciais`) VALUES
+(9, 'Projetos Pr&eacute;vios/Estudos Fornecidos', 'projPrev', 'file', 0, NULL),
+(10, 'Existem diretrizes de projeto/obra da pr&oacute;opria unidade', 'direProjObra', 'yesno', 0, NULL),
+(11, 'Tecnologia Construtiva Definida?', 'tecConstr', 'select', 0, '{"tamanho":5,"padrao":0,"itens":[{"value":"conCon","label":"Convencional de Concreto"},{"value":"preCon","label":"Pré fabricada de Concreto"},{"value":"metalica","label":"Metálica"},{"value":"alvEstr","label":"Alvenaria Estrutural"},{"value":"outrosInp","label":"Outros"}]}'),
+(12, 'Padr&atilde;o construtivo definido?', 'PadraoConstr', 'yesno', 0, NULL);
+INSERT INTO `label_campo_fase` (`id`, `nome`, `nomeAbrv`, `tipo`, `tamanho`, `atribEspeciais`) VALUES ('13', 'Anexar Ata de Reuni&atilde;o', 'anexAta', 'file', '0', 'multifile'), (14, 'Anexar Estudos Pr&eacute;vios', 'anexEP', 'file', '0', NULL), (15, 'Incluir Local', 'incl_local', 'tabela', '0', 'linha_inteira'), (16, 'Descri&ccedil;&atilde;o das Necessidades', 'descrNecessidades', 'textarea', '0', '{"extras": "linha_inteira", "rows":10,"cols":50, "attr": [{"style":"width: 100%"}]}');
+INSERT INTO `obra_fase_campo` (`faseID`, `campoID`) VALUES ('4', '10');
+INSERT INTO `obra_fase_campo` (`faseID`, `campoID`) VALUES ('4', '11');
+INSERT INTO `obra_fase_campo` (`faseID`, `campoID`) VALUES ('4', '12');
+INSERT INTO `obra_fase_campo` (`faseID`, `campoID`) VALUES ('4', '13');
+INSERT INTO `obra_fase_campo` (`faseID`, `campoID`) VALUES ('4', '14');
+INSERT INTO `obra_fase_campo` (`faseID`, `campoID`) VALUES ('4', '15');
+INSERT INTO `obra_fase_campo` (`faseID`, `campoID`) VALUES ('4', '9');
+INSERT INTO `obra_fase_campo` (`faseID`, `campoID`) VALUES ('4', '16');
+UPDATE  `label_obra_fase` SET  `tabBD` =  'plan_progNecess' WHERE  `label_obra_fase`.`id` =4;
+CREATE TABLE IF NOT EXISTS `plan_progNecess` (
+	`id` int(11) NOT NULL,
+	`projPrev` text NULL,
+	`direProjObra` int(1) NULL,
+	`tecConstr` VARCHAR(50) NULL,
+	`PadraoConstr` int(1) NULL,
+	`anexAta` VARCHAR(100) NULL,
+	`anexEP` VARCHAR(100) NULL,
+	`incl_local` text NULL,
+	`descrNecessidades` text NULL,
+	PRIMARY KEY (id)
+) ENGINE = InnoDB DEFAULT CHARSET=latin1;
+ALTER TABLE  `plan_prognecess` CHANGE  `id`  `id` INT( 11 ) NOT NULL AUTO_INCREMENT;
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (83, 'dataReuniao', 'Data Reuni&atilde;o T&eacute;cnica Inicial', 'data', '', '', '0', '0');
+UPDATE `label_doc` SET `campos` = 'numProcContr,numeroContr,anoE,unOrg,valorProj,valorMaoObra,valorMaterial,valorTotal,dataAssinatura,dataReuniao,prazoContr,vigenciaContr,inicioProjObra,prazoProjObra,dataTermino,recursosOrc,elemEconomico' WHERE `label_doc`.`id` = 10;
+ALTER TABLE `doc_contrato`  ADD `dataReuniao` INT(11) NULL AFTER `dataAssinatura`;
+ALTER TABLE  `doc_contrato` CHANGE  `prazoContr`  `prazoContr` INT( 11 ) NOT NULL DEFAULT  '0';
+ALTER TABLE  `doc_contrato` CHANGE  `vigenciaContr`  `vigenciaContr` INT( 11 ) NOT NULL DEFAULT  '0';
+ALTER TABLE  `doc_contrato` CHANGE  `recursosOrc`  `recursosOrc` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL;
+ALTER TABLE  `doc_contrato` CHANGE  `elemEconomico`  `elemEconomico` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL;
+UPDATE  `label_campo` SET  `label` =  'Data de Vencimento da Vig&ecirc;ncia' WHERE  `label_campo`.`id` =75;
+ALTER TABLE  `doc_contrato` CHANGE  `prazoContr`  `prazoContr` INT( 11 ) NULL DEFAULT  '0';
+ALTER TABLE  `doc_contrato` CHANGE  `vigenciaContr`  `vigenciaContr` INT( 11 ) NULL DEFAULT  '0';
+UPDATE  `label_campo` SET  `tipo` =  'data', `extra` =  'noDatePicker aditivo' WHERE  `label_campo`.`id` =74;
+UPDATE  `label_campo` SET  `tipo` =  'input',`extra` =  'aditivo' WHERE  `label_campo`.`id` =74;
+UPDATE  `label_campo` SET  `extra` =  'obrigatorio' WHERE  `label_campo`.`id` =72;
+UPDATE  `label_campo` SET  `label` =  'Prazo de Conclus&atilde;o Projeto/Obra' WHERE  `label_campo`.`id` =77;
+UPDATE  `label_campo` SET  `label` =  'Data Conclus&atilde;o Prevista' WHERE  `label_campo`.`id` =78;
+ALTER TABLE  `doc_contrato` CHANGE  `dataReuniao`  `dataReuniao` INT( 11 ) NULL DEFAULT  '0';
+ALTER TABLE  `doc_contrato` ADD  `empresaID` INT( 11 ) NOT NULL DEFAULT  '0';
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (84, 'empresaID', 'Empresa', 'empresa', '', 'obrigatorio', '0', '0');
+UPDATE `label_doc` SET `campos` = 'numProcContr,numeroContr,anoE,unOrg,valorProj,valorMaoObra,valorMaterial,valorTotal,dataAssinatura,dataReuniao,prazoContr,vigenciaContr,inicioProjObra,prazoProjObra,dataTermino,recursosOrc,elemEconomico,empresaID' WHERE `label_doc`.`id` = 10;
+UPDATE  `label_campo` SET  `extra` =  '' WHERE  `label_campo`.`id` =84;
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (85, 'respEmpr', 'Respons&aacute;vel', 'funcEmpresa', '', '', '0', '0');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (86, 'respTec', 'Respons&aacute;vel T&eacute;cnico', 'funcEmpresa', '', '', '0', '0');
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`) VALUES (87, 'engResidente', 'Engenheiro Residente', 'funcEmpresa', '', '', '0', '0');
+CREATE TABLE IF NOT EXISTS `empresa_emprega` (
+  `empresaID` int(11) NOT NULL,
+  `crea` int(20) NOT NULL,
+  PRIMARY KEY (`empresaID`,`crea`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Relacionamento entre empresa e funcionário';
+CREATE TABLE IF NOT EXISTS `empresa_funcionario` (
+  `crea` int(20) NOT NULL,
+  `nome` varchar(200) NOT NULL,
+  `ativo` int(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`crea`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE IF NOT EXISTS `contrato_empresa_resp` (
+  `docID` int(11) NOT NULL,
+  `crea` varchar(100) NOT NULL,
+  `ART` text,
+  PRIMARY KEY (`docID`, `crea`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+ALTER TABLE  `contrato_empresa_resp` ADD  `tipo` VARCHAR( 20 ) NULL;
+ALTER TABLE  `contrato_empresa_resp` ADD  `ativo` INT( 1 ) NOT NULL DEFAULT  '1';
+UPDATE  `label_campo` SET  `extra` =  'aditivo obrigatorio' WHERE  `label_campo`.`id` =76;
+UPDATE  `label_campo` SET  `extra` =  'aditivo noDatePicker obrigatorio' WHERE  `label_campo`.`id` =77;
+ALTER TABLE  `usuarios` ADD  `flagRespContr` INT( 1 ) NOT NULL DEFAULT  '0';
+CREATE TABLE IF NOT EXISTS `contrato_cpo_resp` (
+  `docID` int(11) NOT NULL COMMENT 'Contrato',
+  `userID` int(11) NOT NULL COMMENT 'Usuário responsável',
+  `tipo` int(1) NOT NULL COMMENT 'Tipo de responsabilidade: 1 -> Diretor, 2-> Coordenador',
+  `data` int(11) NOT NULL,
+  PRIMARY KEY (`docID`,`userID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+ALTER TABLE  `contrato_cpo_resp` CHANGE  `tipo`  `tipo` INT( 1 ) NOT NULL COMMENT  '1 -> Diretor, 2-> Coordenador, 3->R.Empr, 0->Obra';
+ALTER TABLE  `contrato_empresa_resp` ADD  `dataDesativado` INT( 11 ) NOT NULL DEFAULT  '0';
+CREATE TABLE IF NOT EXISTS `contrato_aditivo` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `contratoID`  int(10) NOT NULL,
+  `campo` varchar(50),
+  `valor` int(20),
+  `motivo` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+UPDATE  `label_campo` SET  `attr` =  'type="text"' WHERE  `label_campo`.`id` =4;
+UPDATE  `label_campo` SET  `attr` =  'type="text"' WHERE  `label_campo`.`id` =7;
+UPDATE  `label_campo` SET  `attr` =  'type="text"' WHERE  `label_campo`.`id` =12;
+UPDATE  `label_campo` SET  `attr` =  'type="text"' WHERE  `label_campo`.`id` =13;
+UPDATE  `label_campo` SET  `attr` =  'type="text"' WHERE  `label_campo`.`id` =47;
+INSERT INTO `label_acao` (`id`, `nome`, `abrv`) VALUES ('88', 'Aditivar Contrato', 'aditivar');
+CREATE TABLE IF NOT EXISTS `empreend_historico` (
+  `id` int(20) NOT NULL AUTO_INCREMENT,
+  `empreendID` int(10) NOT NULL,
+  `data`  int(20) NOT NULL,
+  `userID`  int(15) NOT NULL,
+  `tipo` varchar(50) NOT NULL,
+  `user_targetID` int(20),
+  `doc_targetID` int(20),
+  `msg_targetID` int(20),
+  `obra_targetID` int(20),
+  `etapa_targetID` int(10),
+  `fase_targetID` int(10),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+DROP TABLE `obra_historico`;
+CREATE TABLE IF NOT EXISTS `obra_historico` (
+  `id` int(20) NOT NULL AUTO_INCREMENT,
+  `obraID` int(10) NOT NULL,
+  `data`  int(20) NOT NULL,
+  `userID`  int(15) NOT NULL,
+  `tipo` varchar(50) NOT NULL,
+  `user_targetID` int(20),
+  `doc_targetID` int(20),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+UPDATE  `label_campo` SET  `tipo` =  'input' WHERE  `label_campo`.`id` =65;
+ALTER TABLE  `empresa` ADD  `cnpj` VARCHAR( 18 ) NOT NULL AFTER  `nome`;
+
+UPDATE  `label_campo` SET  `extra` =  'aditivo moeda' WHERE  `label_campo`.`id` =69;
+UPDATE  `label_campo` SET  `extra` =  'aditivo moeda' WHERE  `label_campo`.`id` =70;
+UPDATE  `label_campo` SET  `extra` =  'aditivo moeda' WHERE  `label_campo`.`id` =71;
+UPDATE  `label_campo` SET  `extra` =  'aditivo' WHERE  `label_campo`.`id` =74;
+UPDATE  `label_campo` SET  `extra` =  '' WHERE  `label_campo`.`id` =82;
+UPDATE  `label_campo` SET  `extra` =  'moeda' WHERE  `label_campo`.`id` =73;
+UPDATE  `label_acao` SET  `nome` =  'Cadastrar Empreendimento' WHERE  `label_acao`.`id` =11;
+INSERT INTO `label_acao` ( `id` ,`nome` ,`abrv`) VALUES
+('90',  'Editar Equipe do mesmo sem ser Responsavel do empreendimento',  'editEqp'),
+('91',  'Atrib Resp por Fases mesmo sem ser Resp pela etapa/empreend',  'atribFases'),
+('92',  'Criar nova mensagem (exceto responder)',  'criaMsg'),
+('93',  'Responder Mensagem',  'respMsg');
+INSERT INTO `label_acao` (`id`, `nome`, `abrv`) VALUES ('94', 'Cadastrar Empresa', 'cadEmpr'), ('95', 'Editar Empresa', 'edtEmpr');
+INSERT INTO `label_acao` (`id`, `nome`, `abrv`) VALUES ('96', 'Cadastrar Funcion&aacute;rio Empresa', 'cadFunc'), ('97', 'Editar/Desativar Funcion&aacute;rio Empresa', 'edtFunc');
+INSERT INTO `label_acao` (`id`, `nome`, `abrv`) VALUES ('98', 'Salvar Fase Sem ser Responsavel Direto', 'salvaFase'), ('99', 'Editar Fase Sem Ser Responsavel Direto', 'edtFase');

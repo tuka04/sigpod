@@ -1,0 +1,33 @@
+ALTER TABLE  `label_campo` ADD  `tooltip` TEXT NULL;
+UPDATE `label_campo` SET  `tooltip` =  'Em dias.' WHERE  `label_campo`.`id` =74;
+
+CREATE TABLE IF NOT EXISTS `doc_autosave` (
+  `userID` int(11) NOT NULL,
+  `acao` varchar(50),
+  `doc` varchar(20),
+  `data` int(11) DEFAULT '0',
+  `content` mediumtext,
+  `urlVars` text,
+  PRIMARY KEY (`userID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+UPDATE `label_campo` SET  `tooltip` =  'Em dias.' WHERE  `label_campo`.`id` =74;
+
+UPDATE  `label_acao` SET  `nome` =  'Atribui&ccedil;&atilde;o de Guarda-Chuva' WHERE  `label_acao`.`id` =64;
+UPDATE  `label_acao` SET  `nome` =  'Editar Refer&ecirc;ncia a Processo' WHERE  `label_acao`.`id` =65;
+UPDATE  `label_acao` SET  `nome` =  'Atribui&ccedil;&atilde;o de Of&iacute;cio Sigiloso' WHERE  `label_acao`.`id` =66;
+
+
+INSERT INTO `label_acao` (`id`, `nome`, `cat`, `subcat`, `abrv`) VALUES ('101', 'Despachar documento na Cria&ccedil;&atilde;o', 'doc', '', 'desp');
+
+------
+
+
+
+
+ALTER TABLE  `empresa_funcionario` CHANGE  `crea`  `crea` VARCHAR( 25 ) NOT NULL
+ALTER TABLE  `empresa_emprega` CHANGE  `crea`  `crea` VARCHAR( 25 ) NOT NULL
+
+
+ALTER TABLE  `usuarios` ADD  `ultimoLogin` INT( 20 ) NOT NULL DEFAULT  '0'
+
+ALTER TABLE  `data_historico` ADD  `doc_targetID` INT( 10 ) NOT NULL

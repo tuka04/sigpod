@@ -1,0 +1,19 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Configurando o PHP</title>
+</head>
+<body>
+<h1>O arquivo PHP.ini</h1>
+<p>Há duas opções para configurar o PHP na máquina que hospedará a aplicação: a primeira consiste em descompactar o PHP na pasta <b>C:\php\</b> e substituir o arquivo php.ini por <a href="php.ini_example.html">este arquivo com configurações padrão</a> ou configurar o PHP à mão seguindo as descrições abaixo</p>
+<h3>Guia básico para configuração do PHP.ini para o SiGPOD</h3>
+<p>1. Renomear o arquivo php.ini-production para php.ini</p>
+<p>Alterar <b>memory_limit</b> para um valor maior que 64M de modo que o sigpod disponha de mais memória para executar</p>
+<p>Alterar <b>post_max_size</b> para um valor suficientemente grande de maneira que todos os arquivos necessários possam ser enviados para o sigpod (padrão sigpod: &gt;= 256M).</p>
+<p>Aletrar <b>upload_max_filesize</b> para um valor compativel com a variável post_max_size</p>
+<p>Descomentar as linhas dasextensões utilizadas pelo sigpod: <b>extension=php_ldap.dll</b>, <b>extension=php_curl.dll</b>, <b>extension=php_gd2.dll</b>, <b>extension=php_mysql.dll</b>,</p>
+<p>Alterar as configurações regionais para São Paulo<b>date.timezone = America/Sao_Paulo</b></p>
+
+</body>
+</html>

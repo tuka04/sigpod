@@ -1,0 +1,193 @@
+body {
+	background-image: url('../img/bg.png');
+	font-family: Arial, Calibri, sans-serif;
+	font-size: 10pt;
+}
+
+td.topMenu:hover {
+	background-color: #DDDDDD;
+}
+
+td.topMenuActive {
+	background-color: #D0D0D0;
+}
+
+div.alert {
+	display: none;
+	border: 1px red solid;
+	padding: 3px;
+	margin: 3px;
+}
+
+div.cadDisp {padding: 5px;}
+
+input[type="button"],input[type="submit"],input[type="reset"]{
+	border: 1px solid white;
+	outline: 1px solid #A0A0A0;
+	color: white;
+	background-color: #A0A0A0;
+	display: inline;
+	font-weight: bold;
+	padding: 1px 3px 1px 3px;
+	cursor: pointer;
+	padding: 3px 15px;
+}
+
+input[type="button"]:hover,input[type="submit"]:hover,input[type="reset"]:hover{
+	background-color: #707070;
+	outline-color: #707070;
+}
+
+input[type="submit"].buttonlink {
+	border: 0;
+	margin: 0;
+	padding: 0;
+	background-color: transparent;
+	outline: 0;
+	font-weight: normal;
+	color: #BE1010;
+	display: inline;
+}
+
+input[type="submit"].buttonlink:hover {
+	background-color: transparent;
+	outline-color: transparent;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+input.noedit {
+	border: 0px;
+	background-color: transparent;
+	font-weight: bold;
+	outline: none;
+}
+
+a{font-size: 10pt;text-decoration: none; color: #BE1010; cursor: pointer;}
+a:hover, a:active{text-decoration: underline;}
+a.bold{font-weight: bold;}
+
+table{margin: 0px; padding: 0px; border: 0px;}
+tr{margin: 0px; padding: 0px; border: 0px;}
+td{margin: 0px; padding: 0px; border: 0px; vertical-align: top;}
+
+th.c {
+	border-style: dotted;
+	border-width: 0 0 1px 0;
+	border-color:#c0c0c0;
+	padding: 5px;
+	background-image: url(../img/bg.gif);
+	background-repeat: no-repeat;
+	background-position: center right;
+	font-weith: bold;
+}
+
+th.headerSortUp { 
+    background-image: url(../img/asc.gif);
+   	font-weith: normal; 
+}
+th.headerSortDown { 
+    background-image: url(../img/desc.gif);
+    font-weith: normal; 
+} 
+
+td.c,td.cc{border-style: dotted; border-width: 0 0 1px 0; border-color:#c0c0c0; padding: 5px;}
+td.cc{text-align: center;}
+td.vc{vertical-align: middle;}
+tr.c:hover{background-color: #E0E0E0;}
+tr.active{background-color: #d0d0d0;}
+tr.light{margin: 0px; padding: 0px; border: 0px;}
+tr.light:hover{background-color: #f5f5f5; }
+tr.selected{background-color: #FFFFFF; }
+tr.selected:hover{background-color: #FFFFFF; }
+
+tr.droppable {
+		background-color: #E0E0E0;
+}
+
+tr.droppableHover {
+	background-color: #d0d0d0;
+}
+
+font.hist{
+	display: block;
+	width: 100%;
+	padding: 5px 5px 0 5px;
+	font-size: 9pt;
+}
+
+div.subMenu1,div.subMenu2{
+	border-width: 0 0 0 2px;
+	border-style: solid;
+	border-color: #C3C3C3;
+	padding: 2px;
+}
+
+div.subMenu1{background-color: #d8d8d8;}
+div.subMenu2{background-color: #dddddd;}
+
+a.menuHeader,span.menuHeader{
+	color: #BE1010;
+	display:block;
+	font-size:12pt;
+	font-weight:bold;
+	background-color: #D4D4D4;
+	border: 1px solid #C3C3C3;
+	padding: 2px;
+}
+
+a.dragHover {
+	text-decoration: underline;
+}
+
+a.Feriado {
+	color: #BE1010 !important;
+	font-weight: bold !important;
+}
+a.FimDeSemana {
+	color: #A0A0A0 !important;
+}
+
+#ajuda{
+	border: 2px solid #BE1010;
+	position: fixed;
+	top: 5px;
+	right: 5px;
+	width: 25%;
+	display: none;
+	background-color: #F8F8F8;
+	z-index: 9999
+}
+
+span.pLink{color: #BE1010;}
+span.menuHeader:hover,span.menuHeader:active,span.pLink:hover,span.pLink:active,div.close{cursor: pointer; text-decoration: underline;}
+span.par,span.impar {display:block; text-align: right;}
+h1,h2,h3,h4,h5{ color: #BE1010; }
+span.header{color: #BE1010;text-align: center; display:block; font-size:12pt; font-weight:bold;}
+span.headerLeft{color: #BE1010;text-align: left; display:block; font-size:12pt; font-weight:bold; padding: 5px;}
+span.footer{text-align: left; font-size:10pt;}
+
+input.right{
+	text-align: right;
+}
+
+/* tooltip styling. by default the element to be styled is .tooltip  */
+.tooltip {
+    display:none;
+	/*background:transparent url(../img/white_arrow.png);*/
+	background:#fff;
+    border:1px solid #C3C3C3;
+    /*height:70px;*/
+    width:300px;
+    padding:3px;
+    font-size:13px;
+    color: #000000;
+    text-align: center;
+    -moz-box-shadow: 2px 2px 11px #666;
+    -webkit-box-shadow: 2px 2px 11px #666;
+    cursor: move;
+}
+
+
+.errado {
+	background-color: #FFCCCC;

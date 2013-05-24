@@ -1,0 +1,683 @@
+<?php
+/**
+ * @version 0.1 21/3/2011 
+ * @package geral
+ * @author Mario Akita
+ * @desc contem os atributos dos documentos e os metodos para trabalho com empresas 
+ */
+
+class Empresa {
+	private $id;
+	private $nome;
+	private $cnpj;
+	private $endereco;
+	private $complemento;
+	private $cidade;
+	private $cep;
+	private $estado;
+	private $email;
+	private $fax;
+	private $telefone;
+	private $loginDetails;
+	
+	/**
+	 * Objeto de banco de dados
+	 * @var BD
+	 */
+	private $bd;
+
+	/**
+	 * Método construtor
+	 * @param BD $bd
+	 */
+	public function __construct($bd) {
+		$this->id = 0;
+		$this->nome = 'Desconhecida';
+		$this->cnpj = '';
+		$this->endereco = '';
+		$this->complemento = '';
+		$this->cidade = '';
+		$this->cep = '';
+		$this->estado = '';
+		$this->email = '';
+		$this->telefone = '';
+		$this->fax = '';
+		$this->loginDetails = false;
+		$this->bd = $bd;
+	}
+	
+	/**
+	 * Seta o valor do campo
+	 * @param string $campo nome do campo
+	 * @param mixed $value valor a ser setado do campo
+	 */
+	public function set($campo, $value) {
+		if ($campo == null)
+			return null;
+			
+		if (isset($this->$campo)) {
+			$this->$campo = $value;
+			return true;
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Retorna valor do campo
+	 * @param string $campo nome do campo
+	 */
+	public function get($campo) {
+		if (isset($this->$campo)) {
+			return $this->$campo;
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * carrega empresa
+	 * @param int $id id da empresa
+	 * @return boolean success
+	 */
+	public function load($id) {
+		// caso id = 0, não faz nada
+		if (!isset($id) || $id <= 0) {
+			return false;
+		}
+		
+		// carrega do banco
+		$sql = "SELECT * FROM empresa WHERE id = ".$id;
+		$res = $this->bd->query($sql);
+		
+		if (count($res) <= 0) {
+			return false;
+		}
+		
+		$empresa = $res[0];
+		
+		// percorre campos e seta seus valores
+		foreach ($empresa as $campo => $valor) {
+			$this->set($campo, $valor);
+		}
+		
+		$sql = "SELECT username, active FROM empresa_login WHERE empresaID=".$this->id;
+		$res = $this->bd->query($sql);
+		
+		if(count($res) == 1){
+			$this->loginDetails = array('username' => $res[0]['username'], 'active' => $res[0]['active']);
+		}
+		
+		return true;
+	}
+	
+	public function recoverLogin(){
+		$bd = $this->bd;
+		
+		require_once 'mpdf51/mpdf.php';
+		$res = $bd->query("SELECT empresa_login.id,empresa.nome FROM empresa_login INNER JOIN empresa ON empresa.id = empresa_login.empresaID WHERE empresa.id=".$this->id);
+		
+		$password = substr(sha1(time()), 0, 6);
+		
+		if(count($res)){
+			$sql = "UPDATE empresa_login SET password = '".sha1($password)."', active=1  WHERE id=".$res[0]['id'];
+		} else {
+			$res = $bd->query("SELECT nome FROM empresa WHERE id=$this->id");
+			$username = str_ireplace(array(' ', '.'), array('_', ''), stringBusca(SGDecode($res[0]['nome'])));
+			$i = strpos($username, '_');
+			while ($i < 5){
+				$i = strpos($username, '_', $i+1);
+		
+				if($i === false){ $i = strlen($username); break;}
+			}
+			$username = substr($username, 0, $i);
+			$username_new = $username;
+			$j=0;
+			while (count($bd->query("SELECT id FROM empresa_login WHERE username='$username_new'")) > 0){
+				$username_new = $username.(++$j);
+			}
+
+			$sql = "INSERT INTO empresa_login (username, password, empresaID, active) VALUE ('".($username_new)."', '".sha1($password)."', $this->id, 1)";
+		}
+		
+		$success = $bd->query($sql);
+		$dados = $bd->query("SELECT username, password FROM empresa_login WHERE empresaID = $this->id");
+		
+		$html = file_get_contents('templates/empresa_login.html');
+		$html = str_replace(array('{empresaLogin}','{empresaSenha}'), array($dados[0]['username'], $password), $html);
+		
+		$pdf = new mPDF('c','A4',12,'Arial',30,30,35,10,12,5,'P');
+		
+		$pdf->allow_charset_conversion=true;
+		$pdf->charset_in='UTF-8';
+		$pdf->WriteHTML($html);
+		$pdf->Output('files/temp_pdf/empresa_login'.$this->id.'.pdf','F');
+		
+		return true;
+	}
+	
+	function deactivateLogin(){
+		$bd = $this->bd;
+		
+		$sql = "UPDATE empresa_login SET active = 0 WHERE empresaID=".$this->id;
+		
+		return $bd->query($sql);
+	}
+	
+function reactivateLogin(){
+		$bd = $this->bd;
+		
+		$sql = "UPDATE empresa_login SET active = 1 WHERE empresaID=".$this->id;
+		
+		return $bd->query($sql);
+	}
+	
+	/**
+	 * salva empresa
+	 * @return boolean success
+	 */
+	public function save() {
+		global $conf;
+		// var_dump($this);
+		// se o id for zero, insere no bd
+		if ($this->get('id') <= 0) {
+			// se todos os campos estiverem setados, insere
+			// caso contrário, não faz nada
+			if ($this->checkCampos()) {
+				$sql = "INSERT INTO empresa (nome, endereco, complemento, cidade, estado, cep, telefone, email, cnpj, fax) VALUES (";
+				$sql .= "'".$this->get('nome')."', '".$this->get('endereco')."', '".$this->get('complemento')."', '";
+				$sql .= $this->get('cidade')."', '".$this->get('estado')."', '";
+				$sql .= $this->get('cep')."', '".$this->get('telefone')."', '".$this->get('email')."', '".$this->get('cnpj')."', '".$this->get('fax')."')";
+				
+				$id = $this->bd->query($sql, $conf['DBTable'], true);
+				
+				$this->set('id', $id);
+				
+				$textoHist = "Cadastrou a empresa ".$this->get('nome').", endereço ".$this->get('endereco');
+				$textoHist .= ", complemento ".$this->get('complemento').", cidade ".$this->get('cidade');
+				$textoHist .= ", estado ".$this->get('estado').", cep ".$this->get('cep').", telefone ".$this->get('telefone');
+				$textoHist .= ", email ".$this->get('email').", cnpj ".$this->get('cnpj'). ", fax ".$this->get('fax');
+				
+				doLog($_SESSION['username'], $textoHist);
+				
+				return $id;
+			}
+		}
+		else { // id != 0, não é nova empresa
+			// verifica se todos os campos estão setados
+			// caso afirmativo, atualiza bd
+			// caso contrário, não faz nada
+		//	if ($this->checkCampos()) {
+			$this->trataCampos();
+			
+			$sql = "UPDATE empresa SET ";
+			$sql .= "cnpj = '".$this->get('cnpj')."', ";
+			$sql .= "nome = '".$this->get('nome')."', ";
+			$sql .= "endereco = '".$this->get('endereco')."', ";
+			$sql .= "complemento = '".$this->get('complemento')."', ";
+			$sql .= "cidade = '".$this->get('cidade')."', ";
+			$sql .= "estado = '".$this->get('estado')."', ";
+			$sql .= "cep = '".$this->get('cep')."', ";
+			$sql .= "telefone = '".$this->get('telefone')."', ";
+			$sql .= "fax = '".$this->get('fax')."', ";
+			$sql .= "email = '".$this->get('email')."' ";
+			
+			$sql .= "WHERE id = ".$this->get('id');
+			//var_dump($sql);
+			$textoHist = "Atualizou a empresa (id: ".$this->get('id').") ".$this->get('nome').", endereço ".$this->get('endereco');
+			$textoHist .= ", complemento ".$this->get('complemento').", cidade ".$this->get('cidade');
+			$textoHist .= ", estado ".$this->get('estado').", cep ".$this->get('cep').", telefone ".$this->get('telefone');
+			$textoHist .= ", email ".$this->get('email').", cnpj ".$this->get('cnpj'). ", fax ".$this->get('fax');
+				
+			doLog($_SESSION['username'], $textoHist);
+				
+			return $this->bd->query($sql);
+			//} 
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Verifica se todos os campos da empresa estão setados
+	 * @return boolean
+	 */
+	private function checkCampos() {
+		if ($this->get('nome') == "")
+			return false;
+		if ($this->get('cnpj') == "")
+			return false;
+		if ($this->get('cep') == "")
+			return false;
+		if ($this->get('cidade') == "")
+			return false;	
+		if ($this->get('complemento') == "")
+			return false;
+		if ($this->get('email') == "")
+			return false;
+		if ($this->get('endereco') == "")
+			return false;
+		if ($this->get('estado') == "")
+			return false;
+		if ($this->get('telefone') == "")
+			return false;
+		if ($this->get('fax') == "")
+			return false;
+			
+		
+		// trata campos CEP e TELEFONE
+		$this->trataCampos();
+		return true;
+	}
+	
+	/**
+	 * Trata campos Cep e telefone, removendo -, (, )
+	 */
+	public function trataCampos() {
+		/*$telefone = $this->get('telefone');
+		$cep = $this->get('cep');
+		
+		$cep = str_replace('-', '', $cep);
+		$telefone = str_replace('-', '', $telefone);
+		$telefone = str_replace(')', '', $telefone);
+		$telefone = str_replace('(', '', $telefone);
+		
+		$this->set('cep', $cep);
+		$this->set('telefone', $telefone);*/
+	}
+	
+	/**
+	 * Retorna todas as empresas.
+	 * @param BD $bd
+	 * @return array [id][nome]
+	 */
+	public static function getAllCompanies(BD $bd) {
+		$sql = "SELECT id, nome FROM empresa";
+		
+		return $bd->query($sql);
+	}
+	
+	/**
+	 * Mostra formulário para cadastro de contrato
+	 * @param BD $bd
+	 * @return html
+	 */
+	public static function showContrForm(BD $bd) {
+		$select = '<select id="tipoFunc1" name="tipoFunc1">';
+		$select .= '<option value="resp">Respons&aacute;vel</option>';
+		$select .= '<option value="eng">Engenheiro Residente</option>';
+		$select .= '</select>';
+		
+		$html = '<table id="tabelaEmpr" width="100%">';
+		
+		$html .= '<tr><td width="20%"></td><td></td><td width="10%"></td><td></td><td width="10%"></td><td></td></tr>';
+		
+		$html .= '<tr class="c">';
+		$html .= '<td class="c"><b>Funcion&aacute;rio</b>: </td>';
+		$html .= '<td class="c" id="tdFunc1"></td>';
+		$html .= '<td class="c"><b>CREA</b>: </td>';
+		$html .= '<td class="c" id="tdCreaFunc1"></td>';
+		$html .= '<td class="c"><b>Tipo</b>: </td>';
+		$html .= '<td class="c" id="tdTipoFunc1">'.$select.'</td>';
+		$html .= '<td class="c"><b>ART</b>: </td>';
+		$html .= '<td class="c" id="tdFuncART1"><input type="file" name="funcART1" id="funcART1" onclick="newFunc(1)"></td>';
+		$html .= '</tr>';
+		
+		$html .= '</table>';
+		
+		$html .= '
+		<div id="cadFunc" title="Cadastrar Funcion&aacute;rio" style="display: none;">
+		<b>Empresa</b>: <span id="cadFuncEmpresa"></span><br /><br />
+		<b>Nome</b>: <input id="nomeFunc" type="text" /><br />
+		<b>CREA</b>: <input id="creaFunc" type="text" /><br />
+		</div>
+		';
+		return $html;
+	}
+	
+	/**
+	 * Retorna empresas formatadas para gerar Select
+	 * @param BD $bd
+	 * @return [id AS value][nome AS label]
+	 */
+	public static function getEmpresas(BD $bd) {
+		$sql = "SELECT id AS value, nome AS label FROM empresa ORDER BY nome ASC";
+		
+		return $bd->query($sql);
+	}
+	
+	/**
+	 * Cadastra funcionário para esta empresa
+	 * @param array $dados
+	 */
+	public function cadastraFuncionario($dados) {
+		global $bd;
+		global $conf;
+				
+		if (isset($dados['crea']) && $dados['crea'] != "" && isset($dados['nome']) && $dados['nome'] != "") {
+			// verifica se crea já está cadastrado
+			$sql = "SELECT crea FROM empresa_funcionario WHERE crea = '".$dados['crea']."'";
+			$res = $bd->query($sql);
+			
+			// se não estiver, insere funcionário e seu vínculo com esta empresa
+			if (count($res) <= 0) {
+				$sql = "INSERT INTO empresa_funcionario (crea, nome) VALUES ('".$dados['crea']."', '".$dados['nome']."')";
+				$bd->query($sql);
+				
+				doLog($_SESSION['username'], 'Cadastrou o funcionário de CREA '.$dados['crea'].' e nome '.$dados['nome']);
+				
+				$sql = "INSERT INTO empresa_emprega (empresaID, crea) VALUES (".$this->get('id').", '".$dados['crea']."')";
+				$ret = $bd->query($sql);
+				
+				if ($ret) {
+					doLog($_SESSION['username'], 'Vinculou funcionário de CREA '.$dados['crea'].' com empresa de ID '.$this->get('id'));
+				}
+				
+				return array("success" => $ret, 'acaoEfetuada' => 'cad');
+			}
+			else { // caso contrário, só insere o vínculo com a empresa
+				$sql = "SELECT * FROM empresa_emprega WHERE empresaID = ".$this->get('id')." AND crea = '".$dados['crea']."'";
+				$res = $bd->query($sql);
+				
+				if (count($res) <= 0) {
+					$sql = "INSERT INTO empresa_emprega (empresaID, crea) VALUES (".$this->get('id').", '".$dados['crea']."')";
+					$ret = $bd->query($sql);
+					
+					if ($ret) {
+						doLog($_SESSION['username'], 'Vinculou funcionário de CREA '.$dados['crea'].' com empresa de ID '.$this->get('id'));
+					}
+					
+					return array("success" => $ret, 'acaoEfetuada' => 'vinc');
+				}
+				
+				return array("success" => true, 'acaoEfetuada' => null);
+			}
+		}
+		
+		return array("success" => false, 'acaoEfetuada' => null, "feedback" => "Dados Insuficientes");
+	}
+	
+	/**
+	 * Retorna funcionários desta empresa, formatado para criação de select
+	 * @return array [crea AS value][nome AS label]
+	 */
+	public function getFuncionarios() {
+		$bd = $this->get('bd');
+		
+		$sql = "
+		SELECT f.crea AS value, f.nome AS label, f.ativo AS ativo
+			FROM empresa_funcionario AS f INNER JOIN empresa_emprega AS e ON e.crea = f.crea 
+			WHERE e.empresaID = ".$this->get('id')." ORDER BY ativo DESC, nome ASC";
+		
+		
+		$res = $bd->query($sql);
+		
+		// retira html entities
+		foreach ($res as $indice => $r) {
+			$res[$indice]['label'] = SGDecode($r['label']);
+		}
+		
+		//var_dump($res);
+		
+		return $res; 
+	}
+	
+	/**
+	 * Retorna array de funcionários vinculados a um contrato
+	 * @param int $contratoID id do contrato
+	 * @return array [crea][nome][tipo][art][ativo]
+	 */
+	public function getFuncionariosPorContrato($contratoID) {
+		$bd = $this->get('bd');
+		
+		// seleciona todos os funcionários vinculados ao contrato
+		//$sql = "SELECT * FROM contrato_empresa_resp WHERE docID = ".$contratoID." AND ativo = 1";
+		$sql = "SELECT * FROM contrato_empresa_resp WHERE docID = ".$contratoID;
+		$res = $bd->query($sql);
+		
+		$ret = array();
+		if (count($res) <= 0)
+			return $ret;
+		
+		// percorre os funcionários
+		foreach ($res as $r) {
+			// seleciona nome do funcionário
+			$sql = "SELECT nome FROM empresa_funcionario WHERE crea = " .$r['crea'];
+			$f = $bd->query($sql);
+			
+			if (count($f) <= 0)
+				continue;
+				
+			$f = $f[0];
+			
+			// monta array
+			$ret[] = array("crea" => $r['crea'], "nome" => $f['nome'], "tipo" => $r['tipo'], "art" => $r['ART'], "ativo" => $r['ativo']);
+			
+		}		
+		
+		return $ret;
+	}
+	
+	/**
+	 * Mostra Formulario de Cadastro de Empresa
+	 */
+	static function showFormCadastro() {
+		global $conf;
+		return '
+		<b>Cadastrar Empresa:</b><br /><br />
+		<form accept-charset="'.$conf['charset'].'" id="cadEmprForm" method="post" action="empresa.php?acao=cadEmpresa&ajax=false">
+		{$cad_form_campos}
+		<center><input type="submit" value="Cadastrar" /></center>
+		</form>';
+	}
+	
+	/**
+	 * Mostra os campos de cadastro/edicao de Empresa
+	 */
+	static function showCadCampos($comAcesso){
+		return '
+		<div id="cadEmpresaFeedback" style="display:none; border: 2px solid #BE1010; font-weight: bold; color: #BE1010; text-align:center; padding: 5px"></div>
+		<table width="100%" border="0">
+		<tr class="c"><td class="c"><b>Nome da Empresa:</b> <input id="nome" name="nome" size="50"></td></tr>
+		<tr class="c"><td class="c"><b>CNPJ:</b> <input id="cnpj" name="cnpj" size="40"><span id="cnpj_static"></span></td></tr>
+		<tr class="c"><td class="c"><b>Endere&ccedil;o:</b> <input id="endereco" name="endereco" size="60"></td></tr>
+		<tr class="c"><td class="c"><b>Complemento:</b><input id="complemento" name="complemento" size="55"></td></tr>
+		<tr class="c"><td class="c"><b>Cidade:</b> <input id="cidade" name="cidade" size="22"> <b>Estado:</b> <input id="estado" name="estado" size="2"> <b>CEP:</b> <input id="cep" name="cep" size="10"></td></tr>
+		<tr class="c"><td class="c"><b>Telefone:</b> <input id="telefone" name="telefone" size="15"> <b>Fax:</b> <input id="fax" name="fax" size="15"> </td></tr>
+		<tr class="c"><td class="c"><b>e-mail:</b> <input id="email" name="email" size="30"></td></tr>'
+		.($comAcesso == true ? '<tr class="c"><td class="c"><b>Acesso ao site:</b> <input type="radio" id="acesso_sim" name="acesso" value="1" /> Ativar &nbsp;|<input type="radio" id="acesso_nao" name="acesso" value="0" /> Desativar </td></tr>' : '')
+		.'</table>
+		';
+	}
+	
+	/**
+	 * Mostra os detalhes da empresa
+	 */
+	static function showDetEmpresa(){
+		return '
+		<table width="100%" border="0">
+		<tr class="c"><td class="c" colspan="2"></td></tr>
+		<tr class="c"><td class="c" style="width:35%"><b>Nome da Empresa:</b></td><td class="c" style="width:65%"><span id="nome_empresa"></span></td></tr>
+		<tr class="c"><td class="c"><b>CNPJ:</b></td><td class="c"><span id="cnpj_empresa"></span></td></tr>
+		<tr class="c"><td class="c"><b>Endere&ccedil;o:</b></td><td class="c"><span id="endereco_empresa"></span></td></tr>
+		<tr class="c"><td class="c"><b>Complemento:</b></td><td class="c"><span id="complemento_empresa"></span></td></tr>
+		<tr class="c"><td class="c"><b>Cidade/Estado:</b></td><td class="c"><span id="cidade_empresa"></span> / <span id="estado_empresa"></span></td></tr>
+		<tr class="c"><td class="c"><b>CEP:</b></td><td class="c"><span id="cep_empresa"></span></td></tr>
+		<tr class="c"><td class="c"><b>Telefone:</b></td><td class="c"><span id="telefone_empresa"></span></td></tr>
+		<tr class="c"><td class="c"><b>Fax:</b></td><td class="c"><span id="fax_empresa"></span></td></tr>
+		<tr class="c"><td class="c"><b>e-mail:</b></td><td class="c"><span id="email_empresa"></span></td></tr>
+		<tr class="c"><td class="c"><b>Acesso ao site:</b></td><td class="c"><span id="acesso_empresa"></span></td></tr>
+		</table>
+		';
+	}
+	
+	/**
+	 * Mostra o formulario de busca
+	 */
+	static function showFormBusca() {
+		global $conf;
+		return '
+		<b>Buscar Empresa:</b><br /><br />
+		<form accept-charset="'.$conf['charset'].'" action="javascript:void(0) "onsubmit="javascript:buscaEmpresa()">
+		<input id="q" name="q" size="75" />
+		<input type="submit" value="Buscar" />
+		</form>
+		<span id="emprBuscaResLabel" style="display:none; ">
+		<br /><br /><b>Resultado:</b><br />
+		</span>
+		<div id="empresaBuscaResDiv"></div>
+		<div id="empresaBuscaDialog" title=""></div>
+		<div id="empresaEditDialog" title="" style="display:none">{$empresa_cad_form}</div>
+		<div id="empresaDetDialog" title="" style="display:none">{$empresa_detalhes}</div>
+		';
+	}
+	
+	/**
+	 * Mostra o template de funcionarios de uma empresa
+	 */
+	static function showFuncBusca(){
+		global $conf;
+		$template =  array(
+		'func_table' => '
+			<table width="100%" id="func_table">
+				<tr>
+					<td colspan="2">Total de funcion&aacute;rios: <b>{$total_func}</b></td>
+					<td colspan="3" style="text-align:right">{$addFunc_link}</td>
+				</tr>
+				<tr>
+					<td colspan="5">{$cadFuncForm}</td>
+				</tr>
+				<tr>
+					<td class="c"><b>Nome do Funcion&aacute;rio</b></td>
+					<td class="c"><b>N&deg; CREA</b></td>
+					<td class="c"><b>Ativo?</b></td>
+					<td class="c"></td>
+					<td class="c"></td>
+				</tr>
+				{$func_tr}
+			</table>',
+		'func_tr' => '
+			<tr class="c func_tr">
+				<td class="c"><span id="nome_func{$i}">{$nome_func}</span><input type="text" id="input_nome_func{$i}" value="{$nome_func_sem_html}" style="display:none; width:100%" /></td>
+				<td class="c"><span id="crea_func{$i}">{$crea_func}</span></td>
+				<td class="c"><span id="ativo_func{$i}">{$ativo_func}</span></td>
+				<td class="c">{$deactivateFuncLink}</td>
+				<td class="c">{$editFuncLink}</td>
+			</tr>',
+		'nofunc_tr' => '<tr id="empresaSemFunc_tr"><td class="c" colspan="5"><center>Nenhum funcion&aacute;rio encontrado</center></td></tr>',
+		'editFuncLink' => '<a id="edit_link_func{$i}" href="javascript:void(0)" onclick="javascript:showEditFunc({$i})">[Editar]</a>',
+		'deactivateFuncLink' => '<a href="javascript:void(0)" onclick="javascript:activateFunc({$i})">[Desativar]</a>',
+		'addFunc_link' => '<a href="javascript:void(0)" onclick="javascript:showCadFuncForm()">[Cadastrar Funcion&aacute;rio]</a>',
+		'cadFuncForm' => '
+			<div id="cadFuncForm" style="border: 2px solid #BE1010; display:none; padding: 5px;">
+				<span style="padding: 5px; font-weight: bold; text-align:center; display:block; width:100%;">Adicionar Funcion&aacute;rio</span>
+				<form accept-charset="'.$conf['charset'].'" action="javascript:void(0)" onsubmit="javascript:salvaNovoFunc()">
+					<table style="width:100%">
+						<tr>
+							<td colspan="2" class="c"></td>
+							<input type="hidden" id="empresaID" value="{$empresaID}" />
+						</tr>
+						<tr class="c">
+							<td class="c" style="width:35%">
+								<b>Nome:</b>
+							</td>
+							<td class="c" style="width:65%">
+								<input type="text" id="novoFuncNome" name="novoFuncNome" style="width:100%" />
+							</td>
+						</tr>
+						<tr class="c">
+							<td class="c">
+								<b>CREA/Identifica&ccedil;&atilde;o:</b>
+							</td>
+							<td class="c">
+								<input type="text" id="novoFuncCrea" name="novoFuncCrea" style="width:100%" />
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2" class="c" style="text-align:center;"><input type="submit" value="Cadastrar" /></td>
+						</tr>
+					</table> 
+				</form>
+			</div>
+			<div id="cadFuncFeedbackDiv" style="border: 2px solid #BE1010; display:none; padding: 5px; color:red; text-align:center; font-weight: bold;">  </div>
+		'
+		);
+		
+		return $template;
+	}
+	
+	/**
+	 * Ativa/Desativa o funcionario cujo ID eh passado por parametro
+	 * @param int $funcID
+	 */
+	static function ativaFuncionario($funcID){
+		global $bd;
+		//primeiro verifica o ativo funcionario
+		$atual = $bd->query("SELECT ativo FROM empresa_funcionario WHERE crea = {$funcID}");
+		//seta o ativo contrario no BD
+		if(isset($atual[0]['ativo']) && $atual[0]['ativo'] === '1'){
+			return array("success" => $bd->query("UPDATE empresa_funcionario SET ativo = 0 WHERE crea = {$funcID}"), "newStatus" => 0);
+		} elseif(isset($atual[0]['ativo']) && $atual[0]['ativo'] === '0') {
+			return array("success" => $bd->query("UPDATE empresa_funcionario SET ativo = 1 WHERE crea = {$funcID}"), "newStatus" => 1);
+		} else {
+			return array("success" => false, "newStatus" => 1);;
+		}
+	}
+	
+	function isActive(){
+		if (isset($this->loginDetails['active']))
+			return $this->loginDetails['active'];
+		return '0';
+	}
+	
+	function getUsername(){
+		if (isset($this->loginDetails['username']))
+			return $this->loginDetails['username'];
+		return false;
+	}
+	
+	/**
+	 * Edita o nome do funcionario dado um crea/id
+	 * @param int $funcID
+	 * @param string $novoNome
+	 */
+	static function editaFuncionario($funcID, $novoNome){
+		global $bd;
+		
+		return array('success' => $bd->query("UPDATE empresa_funcionario SET nome = '{$novoNome}' WHERE crea = {$funcID}"));
+	}
+	
+	/**
+	 * Enter description here ...
+	 * @param $id
+	 * @param $bd
+	 * @deprecated
+	 */
+	function getEmpresa($id,$bd) {
+		$this->bd = $bd;
+		$empr = $bd->query("SELECT * FROM empresa WHERE id = $id");
+		
+		$this->id           = $empr[0]['id'];
+		$this->nome         = $empr[0]['nome'];
+		$this->endereco     = $empr[0]['endereco'];
+		$this->complemento  = $empr[0]['complemento'];
+		$this->cidade       = $empr[0]['cidade'];
+		$this->estado       = $empr[0]['estado'];
+		$this->cep          = $empr[0]['cep'];
+		$this->telefone     = $empr[0]['telefone'];
+		$this->email        = $empr[0]['email'];
+	}
+	
+	/**
+	 * Enter description here ...
+	 * @param $dados
+	 * @deprecated
+	 */
+	function saveEmpresa($dados){
+		$this->bd->query("INSERT INTO empresa (nome,endereco,completemento,cidade,estado,cep,telefone,email)
+		VALUES ('".$dados['nome']."','".$dados['end']."','".$dados['compl']."','".$dados['cidade']."','".$dados['estado']."','".$dados['cidade']."','".$dados['estado']."','".$dados['cep']."','".$dados['tel']."','".$dados['email']."',)");
+	}
+
+}
+
+?>

@@ -1,0 +1,23 @@
+<p align="right" style="font-family:Arial; size:12pt">Cidade Universitária Zeferino Vaz, {$dia1} de {$mes3} de {$ano2}.</p>
+
+<table style="width: 100%"><tr><td>
+<p align="left" style="font-family:Arial; size:12pt"><b>Inf. nº {$numeroIT}/{$anoE} </b> {$docNome}<br />
+À Unidade: {$unOrgDest_nome}<br />
+Assunto: {$assunto}</p><br /><br />
+</td>
+<td style="align: right; vertical-align: top;">
+{$carimbo}
+</td>
+</tr>
+</table>
+
+<p align="left" style="font-family:Arial; size:12pt">{$conteudo}</p>
+
+<div style="display: block; page-break-inside: avoid;" >
+<p align="center" style="font-family:Arial; size:12pt">
+<br />
+<b>{$Autor_descr} {$Autor_nomeCompl}</b><br />
+{$Autor_cargo} CPO/Unicamp<br />
+Matr. {$Autor_matricula}
+</p>
+</div>

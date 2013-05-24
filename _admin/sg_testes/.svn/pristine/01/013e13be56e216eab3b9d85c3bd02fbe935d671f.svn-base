@@ -1,0 +1,19 @@
+<table border="1" cellspacing="0" cellpadding="0">
+<tr><td>
+<table width="100%">
+	<tr>
+		<td><font style="font-size:10 pt;font-family:Arial;">Fls. Nº</font></td>
+		<td style="border-bottom: 1px solid black"></td>
+	</tr>
+	<tr>
+		<td><font style="font-size:10 pt;font-family:Arial;">Proc. Nº</font></td>
+		<td style="vertical-align: bottom; border-bottom: 1px solid black"><font style="font-size:10 pt;font-family:Arial;">{$numeroComp}</font></td>
+	</tr>
+	<tr>
+		<td><font style="font-size:10 pt;font-family:Arial;">Rubr.</font></td>
+		<td style="border-bottom: 1px solid black"></td>
+	</tr>
+</table>
+</td>
+</tr>
+</table>

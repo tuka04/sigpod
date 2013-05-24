@@ -1,0 +1,22 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Configurando o Apache</title>
+</head>
+<body>
+<h1>O arquivo httpd.php</h1>
+<p><b>DocumentRoot</b> é o caminho para a pasta que será considerada a raiz do sistema. Ao mudar o diretório aqui, deve-se atentar para mudar também as permissões dentro da tag &lt;Directory&gt; correspondente</p>
+<p>Para donfigurar o PHP corretamenente e integrá-lo ao Apache, siga os passos a seguir:</p>
+<p>1. Dentro da tag <b>&lt;IfModule alias_module&gt;</b> : Insira </p>
+<pre>	ScriptAlias /php/ "c:/php/" 
+	Action application/x-httpd-php "/php/php-cgi.exe" </pre>
+<p>2. Dentro da Tag <b>&lt;IfModule mime_module&gt;</b>: Insira </p>
+<pre>	AddType application/x-httpd-php .php
+	AddType application/x-httpd-php .phtml</pre>
+<p>3. Dentro da tag <b>&lt;IfModule dir_module&gt;</b>: Modificar para:</p>
+<pre>	DirectoryIndex index.php index.html</pre>
+
+
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+  <title>modelo_sap</title>
+  <style>
+  	td{padding: 3px; margin: 0; vertical-align: top;}
+  </style>
+</head>
+<body style="font-size: 10pt; font-family: Arial;">
+<div style="width: 100%;">
+<table style="width: 100%;" cellpadding="0" cellspacing="0">
+  <tbody>
+    <tr style="height: 30px;">
+      <td style="width: 55%"></td>
+      <td style="width: 15%"></td>
+      <td style="width: 30%; border-bottom: 1px solid black; border-left: 1px solid black;"><span style="font-size: 10pt;">Fls: </span><span style="font-size: 11pt;"><b>02</b></span></td>
+    </tr>
+    <tr style="height: 30px;">
+      <td rowspan="2" style="text-align: center;">
+      	<span style="font-size: 13pt;"><b>SOLICITA&Ccedil;&Atilde;O DE ABERTURA</b></span>
+      	<span style="font-size: 11pt;"><br /><br /><b>PROCESSO</b> <img src="img/quadrado_x.jpg" border="0"/> &nbsp;&nbsp;&nbsp;&nbsp;<b>OU EXPEDIENTE</b> <img src="img/quadrado.jpg" border="0" /></span>
+      </td>
+      <td rowspan="2" style="border-bottom: 1px solid black; border-left: 1px solid black;"><p style="font-size:10pt">N&deg;</p><br /><p style="font-size:12pt; display:block; width: 100%; text-align:center;"><b>{$numero_sap}/{$anoE}</b></p></td>
+      <td style="border-bottom: 1px solid black; border-left: 1px solid black;"><span style="font-size: 10pt;">PROC:</span></td>
+    </tr>
+    <tr style="height: 30px;">
+      <td style="border-bottom: 1px solid black; border-left: 1px solid black;"><span style="font-size: 10pt;">RUBRICA:</span></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div style="border-bottom: 2px solid black;">
+<table style="width: 100%;" cellpadding="0" cellspacing="0">
+  <tbody>
+    <tr style="">
+      <td style="width: 45%;"><span style="font-size: 9pt;">Protocolo de Destino:<br /><br /><span style="font-size: 10pt;"><b>CPO - Coordenadoria de Projetos e Obras</b></span></span></td>
+      <td style="width: 55%; border-left: 1px solid black; vertical-align: bottom;"><span style="font-size: 8pt;">
+      	&Eacute; dispensado o uso deste formul&aacute;rio nos casos de aquisi&ccedil;&atilde;o, e outros nos quais j&aacute; se disponha, de forma clara, das informa&ccedil;&otilde;es necess&aacute;rias.</span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div style="border-bottom: 2px solid black;">
+<table style="width: 100%;" cellpadding="0" cellspacing="0">
+  <tbody>
+    <tr style="height: 25px">
+      <td colspan="4" style="width: 65%;"><span style="font-size: 10pt;">INTERESSADO DO PROCESSO</span></td>
+      <td rowspan="4" style="border-left: 1px solid black;font-size: 10pt; width: 45%;">ASSUNTO SUGERIDO<br /><br />{$assunto}</td>
+    </tr>
+    <tr style="">
+      <td style="width: 5%;"><img src="{$org_quadrado}" border="0" /></td>
+      <td colspan="3" style="font-size: 10pt; font-size: 10pt; border-bottom: 1px solid black;"><b>EM NOME DE UNIDADE/&Oacute;RG&Atilde;O</b><br />SIGLA: {$unOrgIntSAP_sigla}<br />C&Oacute;DIGO: {$unOrgIntSAP_cod}</td>
+    </tr>
+    <tr style="">
+      <td rowspan="2" style=""><img src="{$pessoa_quadrado}" /></td>
+      <td colspan="3" style="font-size: 10pt; border-bottom: 1px solid black;"><b>EM NOME DE PESSOA</b><br />Nome completo: <br />{$pessoaIntSAP}<br /><br /></td>
+     </tr>
+    <tr style="">
+      <td style="font-size: 8pt;width: 15%;">RG N&deg;<br />{$RGIntSAP}<br /><br /></td>
+      <td style="font-size: 8pt;width: 10%;border-left: 1px solid black;">UF<br />{$UFIntSAP}<br /><br /></td>
+      <td style="font-size: 8pt;width: 25%;border-left: 1px solid black;">(MATR&Iacute;CULA SERVIDOR)<br /><br /><br /></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div style="border-bottom: 2px solid black;">
+  <span style="font-size: 10pt;"><b>ENCAMINHAMENTO POSTERIOR / OUTRAS PROVID&Ecirc;NCIAS</b></span>
+  <br /><br /><br />
+  <span style="font-size: 10pt;"><b>Enviar via malote </b></span><img src="img/quadrado_x.jpg" /> &nbsp;&nbsp;&nbsp;&nbsp; <span style="font-size: 10pt;"><b>Avisar quando pronto, se urgente </b></span><img src="img/quadrado.jpg" />
+</div>
+<div style="">
+<table style="width: 100%;" cellpadding="0" cellspacing="0">
+  <tbody>
+    <tr style="">
+      <td style="font-size: 9pt;width: 25%;">DATA</td>
+      <td colspan="2" style="border-left: 1px solid black;font-size: 9pt; width: 35%;">UNIDADE / &Oacute;RG&Atilde;O SOLICITANTE</td>
+      <td rowspan="3" style="border-left: 1px solid black;border-bottom: 1px solid black;font-size: 8pt; width: 40%;">ASSINATURA DO SOLICITANTE SOBRE CARIMBO<br /><br /></td>
+    </tr>
+    <tr style="">
+      <td style="border-bottom: 1px solid black;font-size: 10pt;"><br />{$dia1}/{$mes1}/{$ano2}</td>
+      <td style="width: 15%; font-size: 9pt; border-bottom: 1px solid black; border-left: 1px solid black;">SIGLA<br /><br />CPO</td>
+      <td style="width: 20%; font-size: 9pt; border-bottom: 1px solid black; border-left: 1px solid black;">C&Oacute;DIGO<br /><br />01.07.63.00.00</td>
+    </tr>
+    <tr style="">
+      <td colspan="2" style="border-bottom: 1px solid black; font-size: 9pt;">NOME PARA CONTATO<br /><br />{$contato_nomeCompl}</td>
+      <td style="width: 20%; font-size: 9pt; border-bottom: 1px solid black; border-left: 1px solid black;">RAMAL<br /><br />{$contato_ramal}</td>
+     </tr>
+  </tbody>
+</table>
+</div>
+<div style="">
+  <br />
+  Tipo de Processo: {$tipoProc}<br /><br />
+  Justificativa: {$justificativa}
+</div>
+</body>
+</html>

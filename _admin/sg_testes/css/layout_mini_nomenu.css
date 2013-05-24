@@ -1,0 +1,27 @@
+﻿div.boxLeft, div.boxRight{ padding: 5px;}
+
+
+div.boxRight{
+min-height:250px;
+float: right;
+width: 99%;
+display: inline;
+}
+
+div.boxCont{
+border-left-style: solid;
+border-right-style: dotted;
+border-top-style: dotted;
+border-bottom-style: dotted;
+border-width: 1px 1px 1px 5px;
+border-color: #BE1010;
+background-color: #E8E8E8;
+width: 99%;
+margin-top: 2px;
+padding: 5px;
+}
+
+div.footer{
+clear: both;
+height: 20px;
+}

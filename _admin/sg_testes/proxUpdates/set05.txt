@@ -1,0 +1,53 @@
+UPDATE  `label_campo` SET  `extra` =  '' WHERE  `label_campo`.`id` =76;
+UPDATE  `label_campo` SET  `extra` =  'aditivo noDatePicker' WHERE  `label_campo`.`id` =77;
+UPDATE  `label_campo` SET  `tipo` =  'input' WHERE  `label_campo`.`id` =76;
+UPDATE  `label_campo` SET  `tipo` =  'data' WHERE  `label_campo`.`id` =76;
+UPDATE  `label_campo` SET  `extra` =  'noDatePicker' WHERE  `label_campo`.`id` =76;
+
+CREATE TABLE IF NOT EXISTS `feriados` (
+  `ano` int(4) unsigned NOT NULL,
+  `id` int(3) unsigned NOT NULL AUTO_INCREMENT,
+  `nome` varchar(50) DEFAULT NULL,
+  `data` int(11) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+ALTER TABLE  `empresa` ADD  `fax` VARCHAR( 16 ) NOT NULL AFTER  `telefone`;
+
+===============================================================================================
+
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`, `tooltip`) VALUES (NULL, 'responsavelID', 'Respons&aacute;vel', 'userID', '', 'select', '0', '0', NULL);
+UPDATE `label_doc` SET `campos` = 'numProcContr,numeroContr,anoE,unOrg,valorProj,valorMaoObra,valorMaterial,valorTotal,dataAssinatura,dataReuniao,prazoContr,vigenciaContr,inicioProjObra,prazoProjObra,dataTermino,recursosOrc,elemEconomico,responsavelID,empresaID' WHERE `label_doc`.`id` = 10;
+UPDATE  `label_campo` SET  `extra` =  'select allUsers' WHERE  `label_campo`.`id` =93;
+
+ALTER TABLE  `obra_contrato` CHANGE  `contratoID`  `docID` INT( 11 ) NOT NULL;
+RENAME TABLE  `obra_contrato` TO  `obra_doc`;
+
+ALTER TABLE  `doc_contrato` ADD  `responsavelID` INT( 11 ) NOT NULL DEFAULT  '0';
+
+ALTER TABLE  `label_acao` CHANGE  `abrv`  `abrv` VARCHAR( 15 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL
+INSERT INTO  `sg_teste`.`label_acao` (`id` ,`nome` ,`cat` ,`subcat` ,`abrv`)VALUES ('5',  'Atribuir a uma Obra',  'sgd',  'geral',  'atribObra');
+
+ALTER TABLE  `label_doc` ADD  `atribObra` INT( 1 ) NOT NULL DEFAULT  '0' AFTER  `buscavel`;
+
+UPDATE label_doc SET atribObra = 1 WHERE id = 1 OR id = 2 OR id=3 OR id=6 OR id=7 OR id=9;
+
+ALTER TABLE  `label_obra_fase` ADD  `ordem` INT( 5 ) NOT NULL DEFAULT  '0' AFTER  `id`
+
+UPDATE  `label_obra_fase` SET  `ordem` =  '1' WHERE  `label_obra_fase`.`id` =1;
+UPDATE  `label_obra_fase` SET  `ordem` =  '2' WHERE  `label_obra_fase`.`id` =3;
+UPDATE  `label_obra_fase` SET  `ordem` =  '3' WHERE  `label_obra_fase`.`id` =2;
+UPDATE  `label_obra_fase` SET  `ordem` =  '4' WHERE  `label_obra_fase`.`id` =5;
+UPDATE  `label_obra_fase` SET  `ordem` =  '5' WHERE  `label_obra_fase`.`id` =4;
+UPDATE  `label_obra_fase` SET  `ordem` =  '6' WHERE  `label_obra_fase`.`id` =6;
+UPDATE  `label_obra_fase` SET  `ordem` =  '7' WHERE  `label_obra_fase`.`id` =7;
+
+ALTER TABLE  `plan_levcampos` CHANGE  `relatorioFoto`  `relatorioFoto` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL;
+ALTER TABLE  `plan_levcampos` CHANGE  `plantaArit`  `plantaArit` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+ALTER TABLE  `plan_levcampos` CHANGE  `plantaEletr`  `plantaEletr` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+ALTER TABLE  `plan_levcampos` CHANGE  `sondagem`  `sondagem` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+ALTER TABLE  `plan_levcampos` CHANGE  `relatorioFoto`  `relatorioFoto` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+INSERT INTO `label_campo` (`id`, `nome`, `label`, `tipo`, `attr`, `extra`, `verAcao`, `editarAcao`, `tooltip`) VALUES (NULL, 'obraSAP', 'Ref Obras', 'outro', '<div id="obraSAP_display"></div><input id="obraSAP_input" disabled="disabled" /><input type="hidden" id="obraSAP" />, '', '0', '0', NULL);
+
+UPDATE  `label_doc` SET  `campos` =  'numero_sap,anoE,contato,unOrgIntSAP,pessoaIntSAP,RGIntSAP,UFIntSAP,assunto,referProc,tipoProc,obraSAP,guardachuva,justificativa' WHERE  `label_doc`.`id` =4;
+

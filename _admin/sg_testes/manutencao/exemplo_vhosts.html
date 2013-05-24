@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Configuração do arquivo vhosts.conf</title>
+</head>
+<body>
+<h1>Configurando vhosts.conf</h1>
+
+O arquivo vhosts é necessário para que diversos subdomínios sejam redirecionados para suas respectivas pastas.
+<pre>
+&lt;VirtualHost sg.cpo.unicamp.br:80&gt;
+    ServerAdmin webmaster@cpo.unicamp.br
+    DocumentRoot "C:/Program Files (x86)/Apache Software Foundation/Apache2.2/htdocs/sigpod"
+    ServerName sg.cpo.unicamp.br
+	ServerAlias sg.cpo.unicamp.br
+    ErrorLog "logs/sg.cpo.unicamp.br-error.log"
+    CustomLog "logs/sg.cpo.unicamp.br-access.log" common
+&lt;/VirtualHost&gt;
+
+</pre>
+
+</body>
+</html>
