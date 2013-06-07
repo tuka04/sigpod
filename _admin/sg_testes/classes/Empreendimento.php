@@ -830,17 +830,17 @@ class Empreendimento {
 		$procs = $this->getProcsContr();
 //		var_dump($procs);exit();
 		$contratos = array();
-		/** Arrumando bug de contratos que não aparecem
-		 *  @author: Leandro Kümmel T. Mendes
-		 *  Correção bug 001-contratos
-		 *  Nova query para pegar por empreendID e um remoçao dos duplicados 
+		/** Arrumando bug de contratos que nao aparecem
+		 *  @author: Leandro Kummel T. Mendes
+		 *  Correcao bug 001-contratos
+		 *  Nova query para pegar por empreendID e um remocao dos duplicados 
 		 *  */
 		$sql = "SELECT id FROM doc WHERE labelID = 10 AND empreendID = ".$this->id;			
 		$res = $this->bd->query($sql);
 		foreach($res as $c) {
 			$flag=true;
 			foreach ($contratos as $fc){
-				if($fc['id']==$c['id'])//não queremos ocorrencias repetidas
+				if($fc['id']==$c['id'])//nï¿½o queremos ocorrencias repetidas
 					$flag=false;
 			}
 			if($flag)
@@ -853,7 +853,7 @@ class Empreendimento {
 			foreach($res as $c) {
 				$flag=true;
 				foreach ($contratos as $fc){
-					if($fc['id']==$c['id'])//não queremos ocorrencias repetidas
+					if($fc['id']==$c['id'])//nï¿½o queremos ocorrencias repetidas
 						$flag=false;
 				}
 				if($flag)

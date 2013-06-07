@@ -21,7 +21,8 @@
 	$html->user = $_SESSION['nomeCompl'];
 	//inicia conexao com o banco de dados
 	$bd = new BD($conf["DBLogin"], $conf["DBPassword"], $conf["DBhost"], $conf["DBTable"]);
-	
+	if(isset($_REQUEST['acao']))
+		$_GET['acao']=$_REQUEST['acao'];
 	if (isset($_GET['acao'])) {
 /*VD*/	if( $_GET['acao'] == "ver" || $_GET['acao'] == "desp" || $_GET['acao'] == "anexArq" || $_GET['acao'] == "entrada" || $_GET['acao'] == "anexDoc" || $_GET['acao'] == 'edit' || $_GET['acao'] == 'saveAnex' || $_GET['acao'] == 'atribEmpreend' || $_GET['acao'] == 'atribObra' || $_GET['acao'] == 'atribEmpreendAjax' ||$_GET['acao'] == 'atribObraAjax' || $_GET['acao'] == 'arquivar' || $_GET['acao'] == 'arqAjax' || $_GET['acao'] == 'solicDesarqAjax') {
 		//rotina para  ver documento
@@ -58,6 +59,7 @@
 			$html->content[3] = '';
 			$html->content[4] = '';
 			$html->content[5] = '';
+
 			//area 3 - historico do documento
 			//$html->content[3] = showHist($doc);
 			//area 4 - area para despachar
@@ -65,6 +67,7 @@
 			//area 5 - area para anexar arquivo
 			//$html->content[5] = showAnexar('f',$doc);
 			//dependendo da acao, gera JS para esconder/mostrar as areas pertinentes
+			
 			if ($_GET['acao'] == "ver") {
 				$html->head .= '
 								<script type="text/javascript" src="scripts/jquery-ui-1.8.18.custom.min.js?r={$randNum}"></script>
@@ -84,6 +87,11 @@
 					$html->content[3] = $doc->showEmpresaResumo();
 				}
 				else {
+					/**
+					 * Solicitacao 002
+					 * inclusão do desanexar.js
+					 */
+					$html->head.='<script type="text/javascript" src="scripts/desanexar.js"></script>';
 					$html->content[1] = showDetalhes($doc);
 					$html->content[3] = showRespostas($doc, $bd);
 				}
@@ -93,6 +101,7 @@
 				//$html->content[4] = showHist($doc);
 				$html->content[4] = $doc->showHist();
 				$html->menu .= '<script type="text/javascript">$(document).ready(function(){$("#c5").hide();});</script>';
+				
 			} elseif ($_GET['acao'] == "desp") {
 				//esconde os detalhes/historico e anexar arquivo. mostra despachar
 				$html->head .= '<script type="text/javascript" src="scripts/jquery-ui-1.8.18.custom.min.js?r={$randNum}"></script><link rel="stylesheet" type="text/css" href="css/smoothness/jquery-ui-1.8.18.custom.css" />';
@@ -243,7 +252,7 @@
 				print json_encode(showSolicDesarq($doc, true));
 				exit();
 			}
-			
+
 			
 /*CD*/	}elseif ($_GET['acao'] == "cad") {
 			//rotina para cadastrar documento
@@ -1198,6 +1207,32 @@
 			exit();
 			
 		}
+		elseif($_REQUEST['acao']=='unappendDoc'){
+			/**
+			 * Solicitacao 002
+			 * Requisicao para remover anexo a partir do docFilho!
+			 * Como a remoção é a partir do doc filho, entao buscamos pelos atributos do pai 
+			 * no banco de dados( para saber qual tabela(s) temos associada(s) )
+			 * fazendo ligacao do .js com .php
+			 */
+			//verifica permissão
+// 			if(! checkPermission(13)){
+// 				showError(12);
+// 			}
+			$doc = new Documento($_REQUEST['id']);
+			$doc->bd = $bd;
+			$doc->loadDados();
+			$doc->loadCampos();
+			if($doc->getDocPai()->removeDocAnexo($_REQUEST['id'],false)){
+				$doc->doLogHist($_SESSION['id'], '', '', '', 'desanexE', '', '', $doc->getDocPai()->id);
+				$doc->getDocPai()->doLogHist($_SESSION['id'], '',	'', '', 'desanexO', '', '', $_REQUEST['id']);
+				echo json_encode(array("success"=>true,"historico"=>$doc->getDocPai()->showHist()));//sucesso
+			}
+			else
+				echo json_encode(array("success"=>false,"error"=>"Erro. Este usuário não tem privilégios suficentes para realizar esta operação."));//algum erro
+			$bd->disconnect();
+			exit(0);//saida ok
+		}
 		else {
 			//se acao eh invalida, volta para o inicio
 			header("Location: index.php");
@@ -1206,8 +1241,7 @@
 		//se nao ha acao especificado, volta para o inicio
 		header("Location: index.php");
 	}
-	
-	
+
 	$html->showPage();
 	$bd->disconnect();
 ?>

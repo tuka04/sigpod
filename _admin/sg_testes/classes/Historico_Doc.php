@@ -112,7 +112,6 @@ class Historico_Doc extends historico {
 			$sql .= "'" . $this->get('despacho') . "', ";
 			$sql .= "'" . $this->get('volumes') . "', ";
 			$sql .= $this->get('doc_targetID') . ")";
-			
 			// insere e retorna id
 			return $bd->query($sql, null, true);
 		}
@@ -307,7 +306,60 @@ class Historico_Doc extends historico {
 					$acao = 'Anexou outro documento a este';
 				}
 			}
-		} else {
+		}
+		elseif ($this->get('tipo') == 'desanexE') {
+			/**
+			 * Solicitacao 002
+			 * Incluindo Remocao do anexo ao historico
+			 */
+			$histOkay = $this->testaDocTargetID(true);
+				
+			if ($histOkay) {
+				$doc = new Documento($this->get('doc_targetID'));
+				//print_r($doc);
+				$doc->loadTipoData();
+				$acao = 'Removeu este anexo do documento <a href="javascript:void(0)" onclick="'.Documento::geraLinkDoc('ver', $doc->id).'">'.$doc->id.' ('.$doc->dadosTipo['nome'].' '.$doc->numeroComp.')</a>';
+			}
+			else {
+				if ($this->get('acao') != "") {
+					$acao = $this->get('acao');
+				}
+				else {
+					$esteDoc = new Documento($this->get('docID'));
+					$esteDoc->loadDados();
+					if ($esteDoc->docPaiID != 0) {
+						$doc = new Documento($esteDoc->docPaiID);
+						$doc->loadTipoData();
+						$acao = 'Removeu este anexo do documento <a href="javascript:void(0)" onclick="'.Documento::geraLinkDoc('ver', $doc->id).'">'.$doc->id.' ('.$doc->dadosTipo['nome'].' '.$doc->numeroComp.')</a>';
+					}
+					else {
+						$acao = 'Removeu este anexo de um documento.';
+					}
+				}
+			}
+		} elseif ($this->get('tipo') == 'desanexO') {
+			/**
+			 * Solicitacao 002
+			 * Incluindo Remocao do anexo ao historico
+			 */
+			$histOkay = $this->testaDocTargetID(true);
+				
+			if ($histOkay) {
+				$doc = new Documento($this->get('doc_targetID'));
+				//var_dump($this->get('doc_targetID'));
+				$doc->loadTipoData();
+				$acao = 'Removeu o anexo <a href="javascript:void(0)" onclick="'.Documento::geraLinkDoc('ver', $doc->id).'">'.$doc->id.' ('.$doc->dadosTipo['nome'].' '.$doc->numeroComp.')</a> deste.';
+			}
+			else {
+				if ($this->get('acao') != "") {
+					$acao = $this->get('acao');
+				}
+				else {
+					$acao = 'Removeu anexo deste';
+				}
+			}
+		}
+		else {
 			$acao = $this->get('acao');
 		}
 		
@@ -333,6 +385,14 @@ class Historico_Doc extends historico {
 		$array['aditivo'] = 'Inseriu novo aditivo a este contrato.';
 		$array['anexoEste'] = 'Anexou este documento ao {$doc_id} ({$doc_tipo_nome} {$doc_numero})';
 		$array['anexOutro'] = 'Anexou o documento <a href="javascript:void(0)" onclick="'.Documento::geraLinkDoc('ver', '{$doc_id}').'">{$doc_id} ({$doc_tipo_nome} {$doc_numero})</a> a este.';
+		/**
+		* Solicitacao 002	
+		*/
+		$array['desanexE'] = 'Removeu este anexo do documento {$doc_id} ({$doc_tipo_nome} {$doc_numero})';
+		$array['desanexO'] = 'Removeu o anexo <a href="javascript:void(0)" onclick="'.Documento::geraLinkDoc('ver', '{$doc_id}').'">{$doc_id} ({$doc_tipo_nome} {$doc_numero})</a> deste.';
+		/**
+		 * fim
+		 */
 		
 		return $array;
 	}
@@ -365,7 +425,24 @@ class Historico_Doc extends historico {
 		return true;
 	}
 	
-	
+	/**
+	 * Solicitacao 002
+	 * ParserHist: Faz o parser o histórico dado uma $str. Essa $str é
+	 * comparada ao tipo e retorna o historico do tipo, (user + dados)
+	 * @param String $str : tipo
+	 * @param int $id : id do historico
+	 * @return stdClass $obj
+	 */
+	public function parserHist($str,$id){
+		$this->load($id);
+		if(strcmp($str, $this->get("tipo"))!=0)
+			return null;
+		$obj = new stdClass();
+		$obj->owner = $this->get("userID");
+		$obj->docID = $this->get("docID");
+		$obj->targetID = $this->get("doc_targetID");
+		return $obj;
+	}
 	/*public function getData() {
 		return $this->data;
 	}*/

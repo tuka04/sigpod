@@ -505,7 +505,10 @@
 	function showDetalhes(Documento $doc){
 		global $conf;
 		global $bd;
-		
+		/**
+		 * Solicitacao 002
+		 */
+		$colspan='2';
 		//adiciona o titulo
 		$html = '<script type="text/javascript">
 		</script>
@@ -518,7 +521,7 @@
 			return $html."<br /><center><b>Não h&aacute; dados dispon&iacute;veis</b></center><br />";		
 		//senao, comeca a montar a tabela
 		$html .= '<table border="0" width="100%"><tr><td width=30%></td><td width=70%></td></tr>';
-		$html .= '<tr class="c"><td class="c"><b>N&uacute;mero do Doc (CPO):</b> </td><td class="c"><span id="docID">'.$doc->id.'</span></td></tr>';
+		$html .= '<tr class="c"><td class="c"><b>N&uacute;mero do Doc (CPO):</b> </td><td '.$colspan.' class="c"><span id="docID">'.$doc->id.'</span></td></tr>';
 		
 		$paiOwner = false;
 		if ($doc->anexado == 1) {
@@ -544,7 +547,7 @@
 					if (verificaSigilo($doc) && !checkPermission(67))
 						break;
 					else
-						$html .= '<tr class="c"><td class="c"><b>'.$c['label'].':</b> </td><td class="c"><span id="'.$c['nome'].'_val">'.$c['valor'].'</span>';
+						$html .= '<tr class="c"><td class="c"><b>'.$c['label'].':</b> </td><td '.$colspan.' class="c"><span id="'.$c['nome'].'_val">'.$c['valor'].'</span>';
 				}
 				//if((($doc->owner == $_SESSION['id'] || ($doc->owner == -1 && $doc->areaOwner == $_SESSION['area']) || verificaOwnerPai($doc)) && checkPermission(2) && $c['cod'] != '') || (checkPermission(3) && verificaOwnerPai($doc) && verificaDespachado($doc))){
 				//var_dump($doc->verificaEditavel($c['nome']));
@@ -561,15 +564,17 @@
 		}
 		
 		//mostra campos extras de documentos, obras e arquivos anexos
-		if (isset($doc->campos["documento"]) && $doc->campos["documento"] != '')
-			if (!verificaSigilo($doc) || checkPermission(67))
-				$html .= '<tr class="c"><td class="c"><b>Documentos Anexos: </b></td><td class="c"> '.showDocAnexo($doc->getDocAnexoDet()).'</td></tr>';
-		
+		if (isset($doc->campos["documento"]) && $doc->campos["documento"] != ''){
+			if (!verificaSigilo($doc) || checkPermission(67)){
+				$html .= '<tr class="c"><td class="c"><b>Documentos Anexos: </b></td><td '.$colspan.' class="c"> '.showDocAnexo($doc->getDocAnexoDet()).'</td></tr>';
+			}
+		}
+		$colspan = 'colspan="2"';
 		//se esse documento foi anexado a algum outro documento, mostra o documento pai
 		if ($doc->anexado){
 			$dp = new Documento($doc->docPaiID);
 			$dp->loadTipoData();
-			$html .= '<tr class="c"><td class="c"><b>Documento Pai:</b> </td><td class="c">'.showDocAnexo(array(array("id" => $dp->id, "nome" => $dp->dadosTipo['nome']." ".$dp->numeroComp))).'</td></tr>';
+			$html .= '<tr class="c"><td class="c"><b>Documento Pai:</b> </td><td '.$colspan.' class="c">'.showDocAnexo(array(array("id" => $dp->id, "nome" => $dp->dadosTipo['nome']." ".$dp->numeroComp))).'</td></tr>';
 		}
 		//se ha obra anexada, monta o campo pertinente
 		//if (isset($doc->campos["obra"]) && $doc->campos['obra'] != 0)
@@ -583,10 +588,12 @@
 		}
 		
 		//mostra os arquivos anexos
-		if (!verificaSigilo($doc) || checkPermission(67))
-			$html .= '<tr class="c"><td class="c"><b>Arquivos Anexos:</b> '.$remontarDocLink.' </td><td class="c" id="pdfAnexos">'.showArqAnexo($doc->anexo, $doc).'</td></tr>';
-			
+		if (!verificaSigilo($doc) || checkPermission(67)){
+			 $arqAnexo = substr(showArqAnexo($doc->anexo, $doc),0,-6);//removendo <br>
+			 $html .= '<tr class="c"><td class="c"><b>Arquivos Anexos:</b> '.$remontarDocLink.' </td><td '.$colspan.' class="c" id="pdfAnexos" attr="unappendName">'.$arqAnexo.'</td></tr>';
+		}
 		$obraList = $doc->getObras(true);
+		
 		if (count($obraList) > 0) {
 			$sqlObra = "SELECT e.id, e.nome FROM obra_empreendimento AS e INNER JOIN obra_obra AS o ON e.id = o.empreendID WHERE ";
 			foreach ($obraList as $o) {
@@ -811,9 +818,35 @@
 		if($anexos == '')
 			return '';
 		//para cada anexode um documento
+		/**
+		 * Solicitacao 002
+		 */
+		 $anex = array();
+		if(count($anexos)>0){
+			$doc = new Documento($anexos[0]['id']);
+			$doc->loadCampos();
+			$doc->loadDados();
+			$docPai = $doc->getDocPai();
+			if($docPai)
+				$anex = $docPai->getAnexos();//esse traz os anexos pelo historico
+		}
 		foreach ($anexos as $a) {
 			//cria um link para visualizar esse doc anexo.
-			$html .= "<a onclick=\"window.open('sgd.php?acao=ver&docID=".$a['id']."','doc','width='+screen.width*".$conf["newWindowWidth"]."+',height='+screen.height*".$conf["newWindowHeight"]."+',scrollbars=yes,resizable=yes').focus()\">Documento ".$a['id'].": ".$a['nome']."</a><br />";
+			/**
+			 * Solicitacao 002
+			 * mudamos $html .= "<a onclick=\"window.open('sgd.php?acao=ver&docID=".$a['id']."','doc','width='+screen.width*".$conf["newWindowWidth"]."+',height='+screen.height*".$conf["newWindowHeight"]."+',scrollbars=yes,resizable=yes').focus()\">Documento ".$a['id'].": ".$a['nome']."</a><br />";
+			 * pelo abaixo
+			 */
+			$unappendDialog = '<div style="display:none;" attr="unappendDialog"><p>Atenção ao desanexar o arquivo voltará ao usuário que criou</p></div>';
+			$button = '<span id="button_'.$a['id'].'" class="" title="Remover anexo '.$a['id'].'""><img src="./img/delete.ico" width="14px" height="14px"/></span>';
+			$display="none";
+			foreach($anex as $v){	
+				if($v->getId()==$a['id']){
+					if($v->getOwner()==$_SESSION['id'])
+						$display="block";
+				}
+			}
+			$html .= "<div id='doc_".$a['id']."' class='unappendDocA' style='width:97%;float:left;'><a onclick=\"window.open('sgd.php?acao=ver&docID=".$a['id']."','doc','width='+screen.width*".$conf["newWindowWidth"]."+',height='+screen.height*".$conf["newWindowHeight"]."+',scrollbars=yes,resizable=yes').focus()\">Documento ".$a['id'].": ".$a['nome']."</a></div><div id='anexo_".$a['id']."' class='unappendDoc' style='display:".$display.";text-align:right;width:3%;float:right;'>".$button.$unappendDialog."</div>";
 		}
 		//retorna o cod HTML a tabela gerada
 		return $html;

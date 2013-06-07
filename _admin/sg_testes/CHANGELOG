@@ -7,7 +7,7 @@ Ultima versao estavel: 1.0
 Versao em desenvolvimento: 1.1
 
 
-Data_Ini   Data_Fim     (sub)versão  Comentario
+Data_Ini   Data_Fim     (sub)versï¿½o  Comentario
 -----------------------------------------------------------------------------------------
 27/05/2011 02/06/2011   1.0.1 (I)    Implantacao do Modulo de Administracao
 									 Inicio da separacao entre Regras de Negocio e regras
@@ -20,23 +20,23 @@ Data_Ini   Data_Fim     (sub)versão  Comentario
 									 Corrigido bug com documentos anexos
 									 Corrigido layout SAP
 									 
-16/06/2011              1.0.4 (E)    Redistribuição das colunas no modelo da RR
+16/06/2011              1.0.4 (E)    Redistribuiï¿½ï¿½o das colunas no modelo da RR
 									 Consertado despacho errado na RR
 									 Consertada string errada na RR (/2011/2011)
-									 Solucionados problemas de privilégio
-									 Adicionado tipo de documento genérico
+									 Solucionados problemas de privilï¿½gio
+									 Adicionado tipo de documento genï¿½rico
 									 Troca de label "Enviar" para "Consultar"
 									 Troca de label "Un/Org de Origem" para "Un/org Expedidor"
-									 Consetrada a busca de ofício
+									 Consetrada a busca de ofï¿½cio
 									 Adicionada facilidade de despacho para grupos
-									 Adicionado botão "Criar CI"
+									 Adicionado botï¿½o "Criar CI"
 									 
 17/06/2011				1.0.5 (E)    Consertado erro no envio de RR
 									 Adicionada possibilidade de cadastro de processos tipo 00 E 00000-0000
 									 Consertada {$desp}na RR
 									 Consertado bug de busca
 									 Despacho para "Todos do Departamento"
-									 Nova facilidade: "Registrar Entrada do doc" dentro do menu de ações
+									 Nova facilidade: "Registrar Entrada do doc" dentro do menu de aï¿½ï¿½es
 									 Despacho aparece como obs na RR
 									 Campo tipo Doc/Num Proc aumentado de 1 digito
 									 Inserido Campo Anexo
@@ -45,59 +45,59 @@ Data_Ini   Data_Fim     (sub)versão  Comentario
 23/06/2011				1.0.6 (E)    Colocado campo de RR de Entrada para facilidade "Registar Entrada deste doc"
 									 Liberado despacho para si mesmo.
 
-30/06/2011				1.0.7 (E)    Remodelação da busca de documentos (Documento Generico/ Data de criação vs. Data de Recebimento vs. data de saida)
-									 Conserto da geração de RR em um clique
-									 Remodelação da busca de despacho 
+30/06/2011				1.0.7 (E)    Remodelaï¿½ï¿½o da busca de documentos (Documento Generico/ Data de criaï¿½ï¿½o vs. Data de Recebimento vs. data de saida)
+									 Conserto da geraï¿½ï¿½o de RR em um clique
+									 Remodelaï¿½ï¿½o da busca de despacho 
 
-09/09/2011				1.0.13 (E)   Correção da busca de Documentos para adição
+09/09/2011				1.0.13 (E)   Correï¿½ï¿½o da busca de Documentos para adiï¿½ï¿½o
 									 Tratamento de Aspas Simples
-									 Correção do modelo de SAP
-									 Modificação no modelo de RR
-									 Correção no modelo de RR
-									 Correção na função de consulta de nomes de usuarios no BD
-									 Correção na visualização de campos do tipo documento
-									 Correção nos modelos RR/SAP/OFI/MEMO p/ mostrar ano
-									 Correção no modelo de RR
+									 Correï¿½ï¿½o do modelo de SAP
+									 Modificaï¿½ï¿½o no modelo de RR
+									 Correï¿½ï¿½o no modelo de RR
+									 Correï¿½ï¿½o na funï¿½ï¿½o de consulta de nomes de usuarios no BD
+									 Correï¿½ï¿½o na visualizaï¿½ï¿½o de campos do tipo documento
+									 Correï¿½ï¿½o nos modelos RR/SAP/OFI/MEMO p/ mostrar ano
+									 Correï¿½ï¿½o no modelo de RR
 									 Aumento do campo "numero do doc. Generico" para 9 digitos
-									 Correção no envio de Arquivo
-									 Correção Enviar RR e registrar despacho dos documentos
+									 Correï¿½ï¿½o no envio de Arquivo
+									 Correï¿½ï¿½o Enviar RR e registrar despacho dos documentos
 
 21/09/2011				1.1.0.0 (I) Cadastro de Obra
 									Busca de Obra
-									Ver detalhes da obra (interface de visualização)
+									Ver detalhes da obra (interface de visualizaï¿½ï¿½o)
 									Adicionar documento a etapa
 									Adicionar etapa da obra
 									Editar obra
-									Não selecionar o ano ao criar um novo doc.
-									Troca de endereços IP por nome ADLAP e BD
-									Mudança na tela de feedback
-									Adição de novos campos no cad de obras (descr,foto,caract)
-									Mudança de assunto na criação do sap
+									Nï¿½o selecionar o ano ao criar um novo doc.
+									Troca de endereï¿½os IP por nome ADLAP e BD
+									Mudanï¿½a na tela de feedback
+									Adiï¿½ï¿½o de novos campos no cad de obras (descr,foto,caract)
+									Mudanï¿½a de assunto na criaï¿½ï¿½o do sap
 									Agrupamento de campi na busca
-									Adição de filtro de busca: por estado
+									Adiï¿½ï¿½o de filtro de busca: por estado
 
-22/09/2011  05/10/2011  1.1.0.1 (I) Correção do BD (tipo <-> caract)
-									Ordenação  respostas por unidade
+22/09/2011  05/10/2011  1.1.0.1 (I) Correï¿½ï¿½o do BD (tipo <-> caract)
+									Ordenaï¿½ï¿½o  respostas por unidade
 									Tratamento caract especiais Label do Marker (GMaps)
-									Troca de "Recursos" por "finanças"
-									Icone padrão
-									Retirar característica "Continuidade"
+									Troca de "Recursos" por "finanï¿½as"
+									Icone padrï¿½o
+									Retirar caracterï¿½stica "Continuidade"
 									Label Caracteristica
 									Busca por tipo
 									Bloquear dar entrada em RR
-									Liberar Anexação ao Ofício
-									Funcionalidade Histórico
-									Adição de 2 atributos para Obra (respObra/respProj e visivelExt)
-									Correção nas Unidades
+									Liberar Anexaï¿½ï¿½o ao Ofï¿½cio
+									Funcionalidade Histï¿½rico
+									Adiï¿½ï¿½o de 2 atributos para Obra (respObra/respProj e visivelExt)
+									Correï¿½ï¿½o nas Unidades
 
-06/10/2011  14/10/2011  1.1.0.2 (I) Correção no historico
+06/10/2011  14/10/2011  1.1.0.2 (I) Correï¿½ï¿½o no historico
 
-15/10/2011  18/10/2011  1.1.0.3 (I) Implementação da busca para o site (EXTERNO)
+15/10/2011  18/10/2011  1.1.0.3 (I) Implementaï¿½ï¿½o da busca para o site (EXTERNO)
 
-19/10/2011  21/10/2011	1.1.0.4 (E) Correção de atributos para obras
-									Correção de algumas relações no BD
-									Correção de histórico no PDF
-									Correção na busca de obras por área
+19/10/2011  21/10/2011	1.1.0.4 (E) Correï¿½ï¿½o de atributos para obras
+									Correï¿½ï¿½o de algumas relaï¿½ï¿½es no BD
+									Correï¿½ï¿½o de histï¿½rico no PDF
+									Correï¿½ï¿½o na busca de obras por ï¿½rea
 
 22/10/2011  ??/11/2011	1.1.0.5 (E) Imagem na listagem de resultados
 									Modelagem da classe Empreendimento
@@ -108,6 +108,8 @@ Data_Ini   Data_Fim     (sub)versão  Comentario
 									Refatoramento das telas de consulta de obra
 									Refatoramento da tela e dos resultados da busca
 
+----------------------------------------------------
+02/05/2013 ??/??/2013  1.1.1.2 (E) Bug 001: Duplicatas e sumiÃ§o de contratos, ok!
 
 (I) Release instavel/interno
 (F) Release estavel

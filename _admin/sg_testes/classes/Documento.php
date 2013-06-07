@@ -915,13 +915,101 @@ class Documento {
 				$linhas .= $hist->printHTML();
 			}
 		}
-		
 		// terminou de montar as linhas do histórico
 		// coloca as linhas dentro do template
 		$html = str_replace('{$linhas_historico}', $linhas, $html);
 		
 		// retorna html
 		return $html;
+	}
+	/**
+	 * Solicitacao 002 : Retorna o objeto anexo associado a este documento BUSCA PELO HISTORICO, entao traz anexos removidos
+	 * @return ArrayObject $anexos
+	 */
+	public function getAnexos(){
+		require_once 'classes/documento/anexo/Anexo.class.php';
+		// instancia um objeto de histórico, através da classe HistFactory
+		$hist = HistFactory::novoHist('doc', $this->bd);
+		// pega todos os históricos associados a este documento
+		$listaHistorico = HistFactory::getHistID('doc', $this->id, $this->bd);
+		$anexos = new ArrayObject();
+		if (count($listaHistorico) > 0) {
+			// percorre os históricos
+			$ids = array();
+			foreach ($listaHistorico as $histID) {
+				// parser o histórico atual
+				$obj = new stdClass();
+				$obj = $hist->parserHist("anexoEste",$histID['id']);
+				if($obj!=null){
+					if($obj->docID == $this->id){//eh pai
+						if(!in_array($obj->targetID,$ids)){
+							$anexos->append(new Anexo($this->bd, $obj->owner, $obj->targetID, $this));
+							$ids[]=$obj->targetID;
+						}
+					}
+					else{//eh filho
+						if(!in_array($this->id,$ids)){
+							$anexos->append(new Anexo($this->bd, $obj->owner, $this->id, $this->getDocPai()));
+							$ids[]=$this->id;
+						}
+					}
+				}
+				$obj = $hist->parserHist("anexOutro",$histID['id']);
+				if($obj!=null){
+					if($obj->docID == $this->id){//eh pai
+						if(!in_array($obj->targetID,$ids)){
+							$anexos->append(new Anexo($this->bd, $obj->owner, $obj->targetID, $this));
+							$ids[]=$obj->targetID;
+						}
+					}
+					else{//eh filho
+						if(!in_array($this->id,$ids)){
+							$anexos->append(new Anexo($this->bd, $obj->owner, $this->id, $this->getDocPai()));
+							$ids[]=$this->id;
+						}
+					}
+				}
+			}
+		}
+		return $anexos;
+	}
+	/**
+	 * Solicitacao 002
+	 * Remove o idPai desse documento;
+	 * @param int $id
+	 * @param boolean $pai
+	 */
+	public function removeDocAnexo($id,$pai){
+		$anexos = $this->getAnexos()->getArrayCopy();
+		$a = new Anexo($this->bd,null,null,0);
+		$ids = array();
+		foreach ($anexos as $a){
+			if(!in_array($a->getId(),$ids) && $a->getId()==$id){
+				if($a->getOwner()!=$_SESSION["id"]){
+					return false;
+				}
+				$ids[]=$a->getId();
+				if(!$a->remove())
+					return false;
+			}
+		}
+		return true;
+	}
+	/**
+	 * Solicitacao 002
+	 * Retorna o Documento pai ao qual esse Documento esta anexado
+	 * @return Documento $docPai
+	 */
+	public function getDocPai(){
+		if($this->docPaiID){
+			$docPai = new Documento($this->docPaiID);
+			$docPai->bd = $this->bd;
+			$docPai->loadDados();
+			$docPai->loadCampos();
+			$docPai->loadTipoData();
+			return $docPai;
+		}
+		return null;
 	}
 	
 	static public function geraLinkDoc($acao, $docID){
