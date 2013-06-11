@@ -837,7 +837,8 @@
 			 * mudamos $html .= "<a onclick=\"window.open('sgd.php?acao=ver&docID=".$a['id']."','doc','width='+screen.width*".$conf["newWindowWidth"]."+',height='+screen.height*".$conf["newWindowHeight"]."+',scrollbars=yes,resizable=yes').focus()\">Documento ".$a['id'].": ".$a['nome']."</a><br />";
 			 * pelo abaixo
 			 */
-			$unappendDialog = '<div style="display:none;" attr="unappendDialog"><p>Atenção ao desanexar o arquivo voltará ao usuário que criou</p></div>';
+			$html_a = "<a onclick=\"window.open('sgd.php?acao=ver&docID=".$a['id']."','doc','width='+screen.width*".$conf["newWindowWidth"]."+',height='+screen.height*".$conf["newWindowHeight"]."+',scrollbars=yes,resizable=yes').focus()\">Documento ".$a['id'].": ".$a['nome']."</a>";
+			$unappendDialog = '<div style="display:none;" attr="unappendDialog"><p>Deseja desanexar o '.$html_a.'</p></div>';
 			$button = '<span id="button_'.$a['id'].'" class="" title="Remover anexo '.$a['id'].'""><img src="./img/delete.ico" width="14px" height="14px"/></span>';
 			$display="none";
 			foreach($anex as $v){	
@@ -846,7 +847,7 @@
 						$display="block";
 				}
 			}
-			$html .= "<div id='doc_".$a['id']."' class='unappendDocA' style='width:97%;float:left;'><a onclick=\"window.open('sgd.php?acao=ver&docID=".$a['id']."','doc','width='+screen.width*".$conf["newWindowWidth"]."+',height='+screen.height*".$conf["newWindowHeight"]."+',scrollbars=yes,resizable=yes').focus()\">Documento ".$a['id'].": ".$a['nome']."</a></div><div id='anexo_".$a['id']."' class='unappendDoc' style='display:".$display.";text-align:right;width:3%;float:right;'>".$button.$unappendDialog."</div>";
+			$html .= "<div id='doc_".$a['id']."' class='unappendDocA' style='width:97%;float:left;'>".$html_a."</div><div id='anexo_".$a['id']."' class='unappendDoc' style='display:".$display.";text-align:right;width:3%;float:right;'>".$button.$unappendDialog."</div>";
 		}
 		//retorna o cod HTML a tabela gerada
 		return $html;
