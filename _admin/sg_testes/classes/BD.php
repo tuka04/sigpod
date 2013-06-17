@@ -5,7 +5,7 @@
 	 * @author Mario Akita
 	 * @desc lida com o requisicoes para o BD
 	 */
-
+require_once "BD/DAO/interfaces/DAO.class.php";
 class BD {
 	/**
 	 * string que contem o host
@@ -88,6 +88,18 @@ class BD {
 	}
 	
 	/**
+	 * Método que faz o replace de tokens que estao na query
+	 * @param string $sql
+	 */
+	private function checkToken($sql){
+		$sql = str_replace(DAO::TOKEN_CAMPOS, "", $sql);
+		$sql = str_replace(DAO::TOKEN_TABELA, "", $sql);
+		$sql = str_replace(DAO::TOKEN_WHERE, "", $sql);
+		$sql = str_replace(DAO::TOKEN_LIMIT, "", $sql);
+		return str_replace(DAO::TOKEN_ORDER, "", $sql);
+	}
+	
+	/**
 	 * @desc executa uma query na tabela passada por parametro
 	 * @param string $sql SQL query a ser executada
 	 * @param string $table tabela para ser procurada
@@ -95,6 +107,7 @@ class BD {
 	 * @return mixed associativa dos resultados ou true (dependendo da consulta)
 	 */
 	public function query($sql, $table = null, $returnIDafterInsert = false) {
+		$sql=$this->checkToken($sql);
 		if($table == null){
 			global $conf;
 			$table = $conf['DBTable'];

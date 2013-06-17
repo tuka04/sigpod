@@ -2146,7 +2146,6 @@
 	function editDoc($docID, $campoName, $newCampoVal) {
 		$doc = new Documento($docID);
 		$doc->loadCampos();		
-		
 		//TODO levantar solução generica para esse problema SGEncode no campo textarea
 		if($campoName == "conteudo")
 			$newCampoVal = SGDecode($newCampoVal,ENT_NOQUOTES);

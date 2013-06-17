@@ -91,6 +91,25 @@
 			include_once('sgp_interface.php');
 		}
 	}
+	/**
+	 * Solicitacao 003
+	 * Faz a requisicao de submodulos.
+	 * @param string $name
+	 */
+	function requireSubModule($name){
+		if(!is_array($name))
+			$nameArray[] = $name;
+		else
+		$nameArray=$name;
+		foreach ($nameArray as $n)
+		if($n=='aditivo'){
+			require_once 'classes/contrato/Aditivo.class.php';
+		}
+		else if($n=='frontend'){
+			require_once 'classes/frontend/html/HtmlTag.class.php';
+			require_once 'classes/frontend/html/HtmlTable.class.php';
+		}
+	}
 	
 	function getVal($array, $key) {
 		if(isset($array[$key]))

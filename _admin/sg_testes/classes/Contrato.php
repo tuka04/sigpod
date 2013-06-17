@@ -937,7 +937,11 @@ class Contrato extends Documento {
 		$html = '
 		<script type="text/javascript" src="scripts/sgd_contrato.js?r={$randNum}"></script>
 		<span class="headerLeft">Dados do Documento</span>';
-
+		/**
+		 * Solicitacao 003
+		 * Inserindo jquery para as mascaras
+		 */
+		$html .= '<script type="text/javascript" src="scripts/plugins/mascara.jquery.js"></script>';
 		// monta tabela exterior
 		$html .= '
 		<table border="0" width="100%">
@@ -1035,16 +1039,23 @@ class Contrato extends Documento {
 		$docPai->loadCampos();
 		if ($docPai->owner == $_SESSION['id'] || ($docPai->owner == -1 && $docPai->areaOwner == $_SESSION['area']))
 			$paiOwner = true;
-
+		/**
+		 * Solicitacao 003
+		 * objetos com ids e conteudo dos span que irao receber o evento (dialog) presente no javascript
+		 */
+		requireSubModule(array('aditivo','frontend'));//requisicao do sub_modulo aditivo
+		$aditivos = new ArrayObject();
+		//fim 003
 		// monta tabelas para mostrar campos do contrato
 		foreach ($campos as $c) {
+
 			$aditivo_div = '';
 			$tabela = 'tabelaEsq';
 			if (Contrato::campoNaDireita($c)) {
 				$tabela = 'tabelaDir';
 			}
-			
 			if(strpos($doc->dadosTipo['emitente'],$c) === false){
+				
 				if ($c == 'empresaID') continue;
 				$c = montaCampo($c,'edt',$doc->campos);
 				if ($c['nome'] == "numProcContr") {
@@ -1054,6 +1065,7 @@ class Contrato extends Documento {
 					$link .= " ".$docPai->numeroComp.'</a>';
 					$c['valor'] = $link;
 				}
+				
 				// verifica se usuário tem permissão para ver este campo
 				if ($c['verAcao'] < 0 || ($c['verAcao'] > 0 && !checkPermission($c['verAcao'])))
 					 continue;
@@ -1064,6 +1076,7 @@ class Contrato extends Documento {
 						break;
 					}
 					else {
+						
 						// monta o display do campo
 						if ($c['tipo'] == 'data') {
 							if ($c['valor'] > 0)
@@ -1071,58 +1084,180 @@ class Contrato extends Documento {
 							else
 								$c['valor'] = '';
 						}
-						
+		
 						$unity = '';
 						if ($c['nome'] == "prazoContr" || $c['nome'] == "prazoProjObra") {
 							$unity = 'dias';
 						}
-						
+						//solicitacao 003: somando aditivos aos valores totais (finais)
+						if($c["nome"]=="dataTermino"){
+							$sumAd="";
+							$total = 0;
+							foreach ($aditivos as $ad){
+								$unity=" dias";
+								if($ad->getVar("tipo")!=AditivoTipo::Diario)
+									continue;
+								$totAd = $ad->getSum();
+								if($totAd>0){
+									$total+=$totAd;
+									if($totAd==1)
+										$unity=" dia";
+									$sumAdTag = new HtmlTag("span", "", ""," (+) ".$totAd.$unity." Aditivo ".$ad->getVar("label"));//soma dos aditivos
+									$sumAd .= "<br/>".$sumAdTag->toString();
+								}
+							}
+							$unity=" dias";
+							$sumAd .= "<hr>";
+							$total = date('d/m/Y', strtotime("+".$total." days",strtotime(str_replace("/", "-", $c["valor"]))));
+							$sumAdTag = new HtmlTag("span", "", ""," (=) ".$total,new HtmlTagStyle("font-weight","bold"));//soma dos aditivos
+							$sumAd .= $sumAdTag->toString();
+						}
+						else if($c["nome"]=="valorTotal"){
+							$total=$c['valor'];
+							$sumAd="";
+							foreach ($aditivos as $ad){
+								if($ad->getVar("tipo")!=AditivoTipo::Monetario)
+									continue;
+								$totAd = $ad->getSum();
+								if($totAd>0){
+									$total+=$totAd;
+									$sumAdTag = new HtmlTag("span", "", ""," (+) R$ ".number_format($totAd, 2, ',', '.')." Aditivo ".$ad->getVar("label"));//soma dos aditivos
+									$sumAd .= "<br/>".$sumAdTag->toString();
+								}
+							}
+							$sumAd .= "<hr>";
+							$sumAdTag = new HtmlTag("span", "", ""," (=) R$ ".number_format($total, 2, ',', '.'),new HtmlTagStyle("font-weight","bold"));//soma dos aditivos
+							$sumAd .= $sumAdTag->toString();
+						}
+						else
+							$sumAd="";
+						//fim 003
 						$$tabela .= '
 						<tr class="c">
 							<td class="c"><b>'.$c['label'].':</b> </td>
 							<td class="c" id="'.$c['nome'].'_value_tr">';
 						if(isset($c['extra']) && strpos($c['extra'], 'moeda') !== false)
 							$$tabela .= 'R$ <span id="'.$c['nome'].'_val">'.number_format($c['valor'], 2, ',', '.').'</span>';
-						else
+						else{
+							if($c["nome"]=="dataTermino")
+								$unity="";
 							$$tabela .= '<span id="'.$c['nome'].'_val">'.$c['valor'].' '.$unity.'</span>';
+						}
+						//solicitacao 003
+						$$tabela .= $sumAd;
+						//fim 003
 					}
+					
 				}
 				
 				//clausula para aditivo
 				if(isset($c['extra']) && strpos($c['extra'], 'aditivo') !== false) {
-					//para adicionar
-					if (checkPermission(88) && $c['valor']) {
+					/**
+					 * Solicitacao 003
+					 */
+					$ad = new Aditivo($this->bd,$this->id,$c["nome"],$c["label"]);//criando novo objeto aditivo
+					if(strpos($c['extra'], 'moeda') !== false)
+						$ad->setVar('tipo', AditivoTipo::Monetario);
+					else
+						$ad->setVar('tipo', AditivoTipo::Diario);
+					$adByName = $ad->getAditivos();//aditivos pelo nome
+					$valorTotal = doubleval($c["valor"]);//valor total do campo
+					$adCount = count($adByName);//total de aditivos para essa campo
+					//para adicionar somente se nao ha aditivos a esse campo
+					if (checkPermission(88) && $c['valor'] && $adCount==0) {
 						$aditivo_div .= ' <a id="'.$c['nome'].'_aditivar_link" href="javascript:void(0)" onclick="javascript:show_aditivar_campo(\''.$c['nome'].'\')">[Aditivar]</a> ';
 					}
 					//inicializa variaveis para calcular total dos aditivos
 					$total_aditivos = 0;
 					//abre tag onde os aditivos serao mostrados
 					$aditivo_div .= '<div id="'.$c['nome'].'_aditivos_div">';
-					//para cada aditivo achado
-					foreach ($this->getAditivos() as $a) {
-						//se o aditivo for referente ao campo sendo montado
-						if($a['campo'] == $c['nome']) {
-							//formata o valor aditivado na forma 00,00%
-							$porcentagem = number_format($a['valor']/$c['valor']*100, 2, ',', '.');
-							//se for tipo moeda, precisa colocar o R$ antes
-							if(strpos($c['extra'], 'moeda') !== false)
-								$aditivo_div .= '<br />R$ <span id="aditivo_valor_'.$a['id'].'">'.number_format($a['valor'], 2, ',', '.').'</span> ';
-							else
-								$aditivo_div .= '<br /><span id="aditivo_valor_'.$a['id'].'">'.str_replace('.', ',', $a['valor']).'</span> ';
-							//se for tipo data, nao mostra porcentagem
-							if($c['tipo'] != 'data')
-								$aditivo_div .= ' (<span id="aditivo_valor_porcentagem_'.$a['id'].'">'.$porcentagem.'</span> %) ';
-							//monta motivo
-							$aditivo_div .= ' (Motivo: <span id="aditivo_motivo_'.$a['id'].'">'.$a['motivo'].'</span>)';
-							$total_aditivos += $a['valor'];
-							//editar ou remover aditivo
-							if (($c['editarAcao'] > 0 && checkPermission($c['editarAcao']) || $c['editarAcao'] == 0) && $doc->verificaEditavel($c['nome'])) {
-								$aditivo_div .= ' <a href="javascript:void(0)" onclick="javascript:show_editar_aditivo('.$a['id'].',\''.$c['nome'].'\')">[Editar]</a> '; 
-								continue;
-							}
-						}
+					//vamos marcar o ultimo aditivo, apenas para inserir o botao de [Aditivar]
+					$lastAdId = -1;
+					foreach ($adByName as $a){
+						if($a["valor"]!=0)
+							$lastAdId=$a["id"];
 					}
-					
+					//para cada aditivo achado
+					foreach ($adByName as $k=>$a) {
+						//div pai
+						$div = new HtmlTag("div","","adpai");
+						$div->setStyle(array("float","width"), array("left","100%"));
+						//div com valor
+						$divValor = new HtmlTag("div", "", "");
+						$divValor->setStyle(array("float","width"), array("left","70%"));
+						//div para DataAccessObject
+						$divDAO = new HtmlTag("div", "", "");
+						$divDAO->setStyle(array("float","text-align","width"), array("right","right","25%"));
+						//fazendo divValor ser filho de div pai
+						$div->setChildren($divValor);
+						//eh proxima da divValor
+						$div->setChildren($divDAO);
+						//guarda valor do aditivo
+						$hidden = new HtmlTag("input", "", "");
+						$hidden->setAttr(array("type","value","name"),array("hidden",$a["valor"],"aditivo_valor_".$a['id']));
+						$hidden->setNext(new HtmlTag("input", "", "","",null,new HtmlTagAttr(array("type","value","name"),array("hidden",$a["motivo"],"aditivo_motivo_".$a['id']))));
+						//nova taghtml
+						$htmlTag = new HtmlTag("span", "aditivo_valor_".$a['id'], "");
+						$htmlTag->setStyle(array("text-decoration","cursor"), array("none","pointer"));//estilo css
+						$htmlTag->setAttr(array("show_admotivo_".$ad->getVar("label"),"attr"), array(true,"aditivo_dialog"));//attr para mostrar o motivo
+						$htmlTag->setChildren($hidden);
+						//dialog vai dentro da divValor
+						$divValor->setVar("children", $htmlTag);
+						//conteudo 
+						$content="";
+						//div que virara dialog
+						$divMore = new HtmlTag("div", "aditivo_show_more_".$a["id"], "");
+						$divMore->setStyle("display", "none");
+						//input hidden para marcar o titulo do dialog
+						$dialogTitle = new HtmlTag("input", "", "");
+						$dialogTitle->setAttr(array("type","value","name"), array("hidden","Aditivo: ".$c["label"],"dialogTitle"));
+						//tabela dentro do dialog
+						$htmlTable = new HtmlTable("show_more_".$a["id"], "aditivo_show_more", 2);
+						$htmlTable->setStyle(array("width","border"), array("90%","1px solid #000000"));
+						$htmlTable->setLineStyle($htmlTable->getVar("style"));
+						//criando os filhos da divMore
+						$divMore->setChildren($dialogTitle);
+						$divMore->setChildren($htmlTable);
+						//div more eh filha da tag Html principal
+						$htmlTag->setChildren($divMore);
+						//inserir o valor no aditivo
+						$ad->setVar("valor", $a["valor"]);
+						//se o aditivo for referente ao campo sendo montado
+						//formata o valor aditivado na forma 00,00%
+						if($a["valor"]==0)
+							continue;						
+						$porcentagem = ($c["valor"]==0)?0.00:number_format($a['valor']/$c['valor']*100.00, 2, ',', '.');
+						//se for tipo moeda, precisa colocar o R$ antes
+						if(strpos($c['extra'], 'moeda') !== false){
+							$valorAditivo=number_format($a['valor'], 2, ',', '.');
+							$valorTotal += doubleval($a['valor']);
+							$htmlTable->appendLine(array("Valor","R$ ".$valorAditivo));
+							$htmlTable->appendLine(array("Porcentagem",$porcentagem."%"));
+							$htmlTable->appendLine(array("Motivo",$a["motivo"]));
+							$content = "(+) R$ ".number_format($valorTotal, 2, ',', '.')."(".$porcentagem."%)";
+						}
+						else{
+							$valorAditivo = intval($a["valor"]);
+							$htmlTable->appendLine(array("Dias",$valorAditivo));
+							$htmlTable->appendLine(array("Porcentagem",$porcentagem."%"));
+							$htmlTable->appendLine(array("Motivo",$a["motivo"]));
+							$content = "(+) ".$valorAditivo.' '.($valorAditivo>1?'dias':'dia')."(".$porcentagem."%)";
+						}
+						if($a["id"]==$lastAdId){
+							$href="javascript:void(0)";
+							$onclick='javascript:show_aditivar_campo("'.$c['nome'].'")';
+							$aditivarDAO = new HtmlTag("a", "", "","[Aditivar]",null,new HtmlTagAttr(array("href","onclick"),array($href,$onclick)));
+							$href="javascript:void(0)";
+							$htmlTag->setNext($aditivarDAO);
+						}
+						$href="javascript:void(0)";
+						$onclick='javascript:show_editar_aditivo("'.$a['id'].'","'.$c['nome'].'")';
+						$divDAO->setChildren(new HtmlTag("a", "", "","[Editar]",null,new HtmlTagAttr(array("href","onclick"),array($href,$onclick))));
+						$htmlTable->setColumnStyle(new HtmlTagStyle(array("font-weight"),array("bold")),-1,0);
+						$htmlTag->setVar("content", $content);
+						$aditivo_div .= "".$div->toString();	
+					}
+					$aditivos->append($ad);
 					$aditivo_div .= '</div>';
 					// se houver aditivos, mostra o tota de aditivos
 					if($total_aditivos){
@@ -1136,15 +1271,16 @@ class Contrato extends Documento {
 						if($c['tipo'] != 'data')
 							$aditivo_div .= ' (<span id="'.$c['nome'].'_total_aditivos_porcentagem">'.number_format($total_aditivos/$c['valor']*100, 2, ',', '.').'</span> %)';
 					}
-					
 					$aditivo = true;
 				}
+				
 				// verifica se o usuário tem permissão para editar o campo
 				if ($c['editarAcao'] < 0 || ($c['editarAcao'] > 0 && !checkPermission($c['editarAcao'])) || !$doc->verificaEditavel($c['nome'])) {
 					$$tabela .= $aditivo_div;
-					$$tabela .= '</td></tr>'; 
+					$$tabela .= '</td></tr>';
 					continue;
 				}
+				
 				// caso tenha, monta formulário de edição
 				$$tabela .= '<form accept-charset="'.$conf['charset'].'" id="'.$c['nome'].'_form" action="javascript: editContrVal(\''.$c['nome'].'\')" method="post" style="display: inline">
 				<span id="'.$c['nome'].'_edit" style="display:none;">
@@ -1155,25 +1291,38 @@ class Contrato extends Documento {
 				$$tabela .= $aditivo_div;
 				$$tabela .= '</td></tr>';
 				
-			}
-		}
-			
+			}//if
+		}//foreach
 		$tabelaEsq .= '</table>';
 		$tabelaDir .= '</table>';
-		
 		if(isset($aditivo)) {
 			//carrega o menu de motivos para atraso
 			$motivos_aditivo = array(array('value'=> 'motivo1', 'label' => 'Erro de Calculo'), array('value'=> 'motivo2', 'label' => 'Erro Humano'), array('value'=> 'motivo3', 'label' => 'Motivo de Preguica Maior'), array('value'=> '_outro', 'label' => 'Outro Motivo'));
 			//seta o HTML do dialog para inserir/editar aditivos
-			$html .= '
-			<div id="aditivar_dialog" title="Aditivar campo" style="display:none">
-			
-			Valor a ser adicionado (em R$ ou dias): <input id="aditivar_valor" /> <br />
-			Raz&atilde;o do aditivo: '.geraSelect('aditivar_razao', $motivos_aditivo, null, '', 'aditivo_razao_select').'
-			<input id="aditivar_razao_outro" style="display:none" />
-			</div>';
+			/**
+		     * Solicitacao 003: arrumando o dialog para separar os input em dias e valor_moeda
+			 */
+			$dialog_html = '<div id="aditivar_dialog" title="Aditivar campo" style="display:none">';//dialog jquery
+			$div_c_desc = '<div class="aditivar_c_desc" style="float:left;">';//descricao do campo a esquerda
+			$div_c_input = '<div class="aditivar_c_input" style="float:left;">';//input do campo
+			$closeElem = new stdClass();//para fechar um elemento html
+			$closeElem->div = '</div>';
+			$c = new stdClass();
+			$c->desc = new stdClass();
+			$c->input = new stdClass();
+			$c->desc->dia = "<div id='aditivar_desc_dia' attr='sw' style='display:none;'> Valor a ser adicionado (dias)</div>";
+			$c->desc->moeda = "<div id='aditivar_desc_moeda' attr='sw' style='display:none;'>Valor a ser adicionado (R$)</div>";
+			$c->desc->razao = '<div id="aditivar_desc_razao"  style="display:block;">Raz&atilde;o do aditivo: </div>';
+			$c->input->dia = '<div id="aditivar_input_dia" attr="sw" style="display:none;"><input id="aditivar_valor" /></div>';
+			$c->input->moeda = '<div id="aditivar_input_moeda" attr="sw" style="display:none;"><input type="text" id="aditivar_valor_moeda" /></div>';
+			$c->input->razao = '<div id="aditivar_input_razao" style="display:block;">'.geraSelect('aditivar_razao', $motivos_aditivo, null, '', 'aditivo_razao_select').'<input id="aditivar_razao_outro" /></div>';
+			$html .= $dialog_html.'<div style="float:left;">'.($div_c_desc.
+					 ($c->desc->dia).($c->desc->moeda).$closeElem->div).
+					 ($div_c_input.($c->input->dia).($c->input->moeda).$closeElem->div).$closeElem->div;
+			$html .= '<div  style="float:left;">'.$div_c_desc.$c->desc->razao.$closeElem->div.$div_c_input.$c->input->razao.$closeElem->div.$closeElem->div;
+			$html .= $closeElem->div;
+			//fim 003
 		}
-		
 		$html = str_replace('{$tabelaEsq}', $tabelaEsq, $html);
 		$html = str_replace('{$tabelaDir}', $tabelaDir, $html);
 		
@@ -1181,6 +1330,30 @@ class Contrato extends Documento {
 			$html .= $this->showEditObrasRec();
 			
 		
+// 		$dialogHtml = new HtmlTag("div", "dialog_aditivo", "");
+// 		foreach ($aditivos as $a){
+// 			$child = new HtmlTag("div", "dialog_aditivo_".$ad->getVar("label"), "");
+// 			$child->setStyle("display", "none");
+// 			$valores = $a->getVar("valor");
+// 			$motivos = $a->getVar("motivo");
+// 			echo "<PRE>";
+// 			print_r($valores);
+// 			echo "</PRE>";
+// 			die('s');
+// 			foreach($valores as $av){
+				
+// 			}
+// 			$ctable = new HtmlTag("table", "", "");
+			
+// 			$dialogHtml->setVar("children", )
+// 			$valores=$a->getVar("valor");
+// 			$motivos=$a->getVar("motivo");
+// 			if(count($valores)>0){
+// 				foreach ($valores as $k=>$v){
+				
+// 				}
+// 			}
+// 		}
 		//retorna o cod html da tabela
 		return $html;
 	}
@@ -1529,9 +1702,18 @@ class Contrato extends Documento {
 		
 		return $novo;
 	}
-	
-	function getAditivos(){
-		return $this->bd->query("SELECT id, campo, valor, motivo FROM contrato_aditivo WHERE contratoID = {$this->id}");
+	/**
+	 * Solicitacao 003
+	 * Inserimos na query a busca pelo campo
+	 * @param string $campo
+	 * @return Ambigous <mixed, boolean, number, multitype:multitype: >
+	 */
+	function getAditivos($campo=""){
+		if(!empty($campo))
+			$qr = "SELECT id, campo, valor, motivo FROM contrato_aditivo WHERE contratoID = {$this->id} AND contrato_aditivo.campo LIKE '".$campo."'";
+		else
+			$qr = "SELECT id, campo, valor, motivo FROM contrato_aditivo WHERE contratoID = {$this->id}";
+		return $this->bd->query($qr);
 	}
 	
 	static function getProxDiaUtil($data, $timestamp = false) {

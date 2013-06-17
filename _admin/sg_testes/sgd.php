@@ -1241,7 +1241,6 @@
 		//se nao ha acao especificado, volta para o inicio
 		header("Location: index.php");
 	}
-
 	$html->showPage();
 	$bd->disconnect();
 ?>

@@ -190,4 +190,19 @@ input.right{
 
 
 .errado {
-	background-color: #FFCCCC;
+	background-color: #FFCCCC;	
+}
+
+/**
+* Solicitacao 003
+**/
+
+table.aditivo_show_more {
+	border-collapse: collapse;
+}
+
+table.aditivo_show_more tr td {
+	border:1px solid #000000;
+	padding:2px;
+	text-align:center;
+}

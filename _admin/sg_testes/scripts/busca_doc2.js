@@ -105,149 +105,150 @@ function doBusca(inicio, numResultados){
 		}, function(data){
 		//alert(data); 
 		//data = eval(data);
-		try {
-			data = eval(data);
-		} catch(e) {
-			if (e instanceof SyntaxError) {
-				alert("Erro encontrado. Contacte seu administrador e mostre essa mensagem: " + e.message + "\n JSON retornado: "+data);
-				return;
-				//alert(data);
-			}
-		}
-		
-		if(data.length != 0){
-			$("#resBusca").html("");
-			geraPaginas(data[0].total, inicio/numResultados, true);
-			
-			if (!apenasContr) {
-				$("#resBusca").append('<table width="100%" id="res"><tr><td class="cc"><b>n° Doc.</b></td><td class="cc"><b>Tipo/Número</b></td><td class="cc"><b>Unidade/&Oacute;rg&atilde;o Interessado</b></td><td class="cc"><b>Assunto</b></td><td class="cc"><b>Empreendimento</b></td><td class="cc"><b>A&ccedil;&atilde;o</b></td></tr>');
-			}
-			else {
-				$("#resBusca").append('<table width="100%" id="res"><tr><td class="cc"><b>n° Doc.</b></td><td class="cc"><b>Número do Contrato</b></td><td class="cc"><b>Obras</b></td><td class="cc"><b>Tipo Processo</b></td><td class="cc"><b>Processo</b></td><td class="cc"><b>Empresa</b></td><td class="cc"><b>Data Vig&ecirc;ncia</b></td><td class="cc"><b>Data Conclus&atilde;o</b></td></tr>');
+			try {
+				data = eval(data);
+			} catch(e) {
+				if (e instanceof SyntaxError) {
+					alert("Erro encontrado. Contacte seu administrador e mostre essa mensagem: " + e.message + "\n JSON retornado: "+data);
+					return;
+					//alert(data);
+				}
 			}
 			
-			$.each(data,function(i){
-				var id = data[i].id;
-				var nome = data[i].nome;
-				var emissor = data[i].emitente;
-				var assunto = data[i].assunto;
-				var empreendList = data[i].empreendList;
-				var empreendimento = new Array();
-				empreendimento[0] = "";
-				if (empreendList != null && empreendList.length > 0) { // este doc esta atribuido a um empreendimento ? se sim, cria link
-					for (e = 0; e < empreendList.length; e++) {
-						empreendimento[e] = newWinLink('sgo.php?acao=verEmpreend&empreendID='+empreendList[e][0], 'obra', screen.width*newWinWidth, screen.height*newWinHeight, empreendList[e][1]);
-					}
-					
-					if (data[i].guardachuva != null && data[i].guardachuva == 1) { // se for guardachuva, adiciona link para atribuicao
-						if (urlVar['onclick'] == 'associarEmpreend')
-							urlVar['target'] = id;
-						if (urlVar['onclick'] == '') { 
-							urlVar['onclick'] = 'associarEmpreend';
-							urlVar['target'] = id;
-						}
-					}
-					else { // nao eh guardachuva
-						if (urlVar['onclick'] == 'associarEmpreend') {
-							urlVar['onclick'] = '';
-							urlVar['target'] = '';
-						}
-					}
-				}
-				else { // se nao, verifica se e' um processo do tipo de obra e caso afirmativo, cria link (data[0].tipo.nomeAbrv == "pr") &&
-					if ((data[i].tipoProc != null) && (data[i].tipo.nomeAbrv == "pr") &&
-						((data[i].tipoProc == "outro") || (data[i].tipoProc == "plan") || (data[i].tipoProc == "contrProj") || (data[i].tipoProc == "contrObr") || (data[i].tipoProc == "acompTec") || (data[i].tipoProc == "pagProj"))) {
-						if (urlVar['onclick'] == 'associarEmpreend')
-							urlVar['target'] = id;
-						if (urlVar['onclick'] == '') { 
-							urlVar['onclick'] = 'associarEmpreend';
-							urlVar['target'] = id;
-						}
-					}
-					else {
-						if (urlVar['onclick'] == 'associarEmpreend') {
-							urlVar['onclick'] = '';
-							urlVar['target'] = '';
-						}
-					}
-				}
-				//var lk = newWinLink('sgd.php?acao=ver&docID='+id,'detalhe'+id,950,650,nome);
-				var lk = newWinLink('sgd.php?acao=ver&docID='+id,'doc',screen.width*newWinWidth,screen.height*newWinHeight,nome);
-				var actionList = "";
-				actionList += urlVar['onclick'];
-				
-				// verifica se o doc está arquivado. Se estiver, consulta qual acao o usuario pode fazer (desarquivar ou solicitar desarq.)
-				if (data[i].arquivado == 1) {
-					actionList = AcaoArquivar;
-				}
-				
-				var acao = addAction(actionList,id,nome,data[i].anexado,urlVar['target'],data[i].anexavel);
-				
-				var empr = "";
-				for (contador = 0; contador < empreendimento.length; contador++) { 
-					empr += empreendimento[contador];
-					if (contador+1 != empreendimento.lenght) empr += "<br />";
-				}
-				
-				if (data[i].ownerName != null) {
-					owner = ' title="Este documento foi despachado para '+data[i].ownerName+'."';
-				}
-				else {
-					owner = ' title="Este documento est&aacute; fora da CPO."';
-					if (data[i].docPaiID != 0 && data[i].anexado) owner = ' title="Este documento est&aacute; anexado."';
-					if (data[i].arquivado == 1) owner = ' title="Este documento est&aacute; arquivado."';
-				}
+			if(data.length != 0){
+				$("#resBusca").html("");
+				geraPaginas(data[0].total, inicio/numResultados, true);
 				
 				if (!apenasContr) {
-					$("#res").append('<tr class="c"><td class="cc">'+id+'</td><td class="cc" '+owner+'>'+lk+'</td><td class="cc">'+emissor+'</td><td class="cc">'+assunto+'</td><td class="cc">'+empr+'</td><td class="cc">'+acao+'</td></tr>');
+					$("#resBusca").append('<table width="100%" id="res"><tr><td class="cc"><b>n° Doc.</b></td><td class="cc"><b>Tipo/Número</b></td><td class="cc"><b>Unidade/&Oacute;rg&atilde;o Interessado</b></td><td class="cc"><b>Assunto</b></td><td class="cc"><b>Empreendimento</b></td><td class="cc"><b>A&ccedil;&atilde;o</b></td></tr>');
 				}
 				else {
-					var linha = '';
-					var tipoProc = 'Contrata&ccedil;&atilde;o de Obra';
-					var lk = newWinLink('sgd.php?acao=ver&docID='+id,'doc',screen.width*newWinWidth,screen.height*newWinHeight,data[i].numeroCompl);
-					var obras = data[i].data_contrato.obras;
-					var processoPai = '';
-					
-					linha += '<tr class="c">';
-					linha += '<td class="cc">'+id+'</td>';
-					linha += '<td class="cc" '+owner+'>'+lk+'</td>';
-					
-					linha += '<td class="cc">';
-					if (obras.lenght <= 0) {
-						linha += 'Nenhuma obra associada';
-					}
-					else {
-						var obra_link = '';
-						for (var j = 0; j < obras.length; j++) {
-							obra_link = newWinLink('sgo.php?acao=verObra&obraID='+obras[j].id, 'obra', screen.width*newWinWidth, screen.height*newWinHeight, obras[j].nome);
-							linha += obra_link + '<br />';
+					//solicitacao 003, removendo data de vigencia <td class="cc"><b>Data Vig&ecirc;ncia</b></td>
+					$("#resBusca").append('<table width="100%" id="res"><tr><td class="cc"><b>n° Doc.</b></td><td class="cc"><b>Número do Contrato</b></td><td class="cc"><b>Obras</b></td><td class="cc"><b>Tipo Processo</b></td><td class="cc"><b>Processo</b></td><td class="cc"><b>Empresa</b></td><td class="cc"><b>Data Conclus&atilde;o</b></td></tr>');
+				}
+				
+				$.each(data,function(i){
+					var id = data[i].id;
+					var nome = data[i].nome;
+					var emissor = data[i].emitente;
+					var assunto = data[i].assunto;
+					var empreendList = data[i].empreendList;
+					var empreendimento = new Array();
+					empreendimento[0] = "";
+					if (empreendList != null && empreendList.length > 0) { // este doc esta atribuido a um empreendimento ? se sim, cria link
+						for (e = 0; e < empreendList.length; e++) {
+							empreendimento[e] = newWinLink('sgo.php?acao=verEmpreend&empreendID='+empreendList[e][0], 'obra', screen.width*newWinWidth, screen.height*newWinHeight, empreendList[e][1]);
+						}
+						
+						if (data[i].guardachuva != null && data[i].guardachuva == 1) { // se for guardachuva, adiciona link para atribuicao
+							if (urlVar['onclick'] == 'associarEmpreend')
+								urlVar['target'] = id;
+							if (urlVar['onclick'] == '') { 
+								urlVar['onclick'] = 'associarEmpreend';
+								urlVar['target'] = id;
+							}
+						}
+						else { // nao eh guardachuva
+							if (urlVar['onclick'] == 'associarEmpreend') {
+								urlVar['onclick'] = '';
+								urlVar['target'] = '';
+							}
 						}
 					}
-					linha += '</td>';
+					else { // se nao, verifica se e' um processo do tipo de obra e caso afirmativo, cria link (data[0].tipo.nomeAbrv == "pr") &&
+						if ((data[i].tipoProc != null) && (data[i].tipo.nomeAbrv == "pr") &&
+							((data[i].tipoProc == "outro") || (data[i].tipoProc == "plan") || (data[i].tipoProc == "contrProj") || (data[i].tipoProc == "contrObr") || (data[i].tipoProc == "acompTec") || (data[i].tipoProc == "pagProj"))) {
+							if (urlVar['onclick'] == 'associarEmpreend')
+								urlVar['target'] = id;
+							if (urlVar['onclick'] == '') { 
+								urlVar['onclick'] = 'associarEmpreend';
+								urlVar['target'] = id;
+							}
+						}
+						else {
+							if (urlVar['onclick'] == 'associarEmpreend') {
+								urlVar['onclick'] = '';
+								urlVar['target'] = '';
+							}
+						}
+					}
+					//var lk = newWinLink('sgd.php?acao=ver&docID='+id,'detalhe'+id,950,650,nome);
+					var lk = newWinLink('sgd.php?acao=ver&docID='+id,'doc',screen.width*newWinWidth,screen.height*newWinHeight,nome);
+					var actionList = "";
+					actionList += urlVar['onclick'];
 					
-					if (data[i].data_contrato.proc.tipoProc == 'contrProj')
-						tipoProc = 'Contrata&ccedil;&atilde;o de Projeto';
+					// verifica se o doc está arquivado. Se estiver, consulta qual acao o usuario pode fazer (desarquivar ou solicitar desarq.)
+					if (data[i].arquivado == 1) {
+						actionList = AcaoArquivar;
+					}
 					
-					linha += '<td class="cc">'+tipoProc+'</td>';
+					var acao = addAction(actionList,id,nome,data[i].anexado,urlVar['target'],data[i].anexavel);
 					
-					processoPai = newWinLink('sgd.php?acao=ver&docID='+data[i].data_contrato.proc.id,'doc',screen.width*newWinWidth,screen.height*newWinHeight, data[i].data_contrato.proc.numeroCompl);
+					var empr = "";
+					for (contador = 0; contador < empreendimento.length; contador++) { 
+						empr += empreendimento[contador];
+						if (contador+1 != empreendimento.lenght) empr += "<br />";
+					}
 					
-					linha += '<td class="cc">'+processoPai+'</td>';
-					linha += '<td class="cc">'+data[i].data_contrato.empresa+'</td>';
-					linha += '<td class="cc">'+data[i].vigenciaContr+'</td>';
-					linha += '<td class="cc">'+data[i].dataTermino+'</td>';
-					linha += '</tr>';
+					if (data[i].ownerName != null) {
+						owner = ' title="Este documento foi despachado para '+data[i].ownerName+'."';
+					}
+					else {
+						owner = ' title="Este documento est&aacute; fora da CPO."';
+						if (data[i].docPaiID != 0 && data[i].anexado) owner = ' title="Este documento est&aacute; anexado."';
+						if (data[i].arquivado == 1) owner = ' title="Este documento est&aacute; arquivado."';
+					}
 					
-					$("#res").append(linha);
-				}
-			});
-			$("#resBusca").append("</table>");
-			$("#resBusca").append('<div id="buscaAlert"></div>');
-			geraPaginas(data[0].total, inicio/numResultados, false);
-			$("td[title]").tooltip({ offset: [-10, 2], effect: "slide", delay: 0 }).dynamic({ bottom: { direction: "down", bounce: true } });
-		}else{
-			$("#resBusca").html("<center><b>N&atilde;o foi encontrado nenhum documento.</b></center>");
-		}
+					if (!apenasContr) {
+						$("#res").append('<tr class="c"><td class="cc">'+id+'</td><td class="cc" '+owner+'>'+lk+'</td><td class="cc">'+emissor+'</td><td class="cc">'+assunto+'</td><td class="cc">'+empr+'</td><td class="cc">'+acao+'</td></tr>');
+					}
+					else {
+						var linha = '';
+						var tipoProc = 'Contrata&ccedil;&atilde;o de Obra';
+						var lk = newWinLink('sgd.php?acao=ver&docID='+id,'doc',screen.width*newWinWidth,screen.height*newWinHeight,data[i].numeroCompl);
+						var obras = data[i].data_contrato.obras;
+						var processoPai = '';
+						
+						linha += '<tr class="c">';
+						linha += '<td class="cc">'+id+'</td>';
+						linha += '<td class="cc" '+owner+'>'+lk+'</td>';
+						
+						linha += '<td class="cc">';
+						if (obras.lenght <= 0) {
+							linha += 'Nenhuma obra associada';
+						}
+						else {
+							var obra_link = '';
+							for (var j = 0; j < obras.length; j++) {
+								obra_link = newWinLink('sgo.php?acao=verObra&obraID='+obras[j].id, 'obra', screen.width*newWinWidth, screen.height*newWinHeight, obras[j].nome);
+								linha += obra_link + '<br />';
+							}
+						}
+						linha += '</td>';
+						
+						if (data[i].data_contrato.proc.tipoProc == 'contrProj')
+							tipoProc = 'Contrata&ccedil;&atilde;o de Projeto';
+						
+						linha += '<td class="cc">'+tipoProc+'</td>';
+						
+						processoPai = newWinLink('sgd.php?acao=ver&docID='+data[i].data_contrato.proc.id,'doc',screen.width*newWinWidth,screen.height*newWinHeight, data[i].data_contrato.proc.numeroCompl);
+						
+						linha += '<td class="cc">'+processoPai+'</td>';
+						linha += '<td class="cc">'+data[i].data_contrato.empresa+'</td>';
+						// solicitacao 003: remover dataVigencia linha += '<td class="cc">'+data[i].vigenciaContr+'</td>';
+						linha += '<td class="cc">'+data[i].dataTermino+'</td>';
+						linha += '</tr>';
+						
+						$("#res").append(linha);
+					}
+				});
+				$("#resBusca").append("</table>");
+				$("#resBusca").append('<div id="buscaAlert"></div>');
+				geraPaginas(data[0].total, inicio/numResultados, false);
+				$("td[title]").tooltip({ offset: [-10, 2], effect: "slide", delay: 0 }).dynamic({ bottom: { direction: "down", bounce: true } });
+			}else{
+				$("#resBusca").html("<center><b>N&atilde;o foi encontrado nenhum documento.</b></center>");
+			}
 		
 	});
 	

@@ -1,4 +1,23 @@
 $(document).ready(function(){
+	//solicitacao 003
+	$("span[attr='aditivo_dialog']").on("click",function(){
+		var aid = $(this).attr('id').split("_");
+		var id = aid[aid.length-1];
+		var $el = $("#aditivo_show_more_"+id);
+		$el.dialog({
+			resizable: true,
+			height: 180,
+			width: 450,
+			title:$el.children("input[type='hidden'][name='dialogTitle']").attr("value"),
+			modal: true,
+			buttons:{
+					"Fechar":function(){
+			        	$(this).dialog("close");
+			        }
+			}
+		});
+	});
+	//fim 003
 	$(".aditivo_razao_select").change(function(event){
 		var selecionado = event.currentTarget;
 		if(selecionado.value == '_outro'){
@@ -313,6 +332,7 @@ function newFunc(numero) {
 }
 
 function editContrVal(campoNome){	
+	$("#inicioProjObra").mascara("data");//solicitacao 003
 	$("#"+campoNome+"_val").hide();
 	$("#"+campoNome+"_edit").show();
 	$("#"+campoNome+"_link").val("Salvar");
@@ -506,6 +526,29 @@ function salvaEditRecursos(docID, recursos) {
 
 //mostra campo de cadastro de aditivo
 function show_aditivar_campo(nome_campo){
+	/**
+	 * Solicitacao 003
+	 */
+	$("div[attr='sw']").css('display','none');
+	if(nome_campo=="valorMaoObra"){
+		$("#aditivar_input_moeda input").mascara("moeda");
+		$("#aditivar_desc_moeda").css("display","block");
+		$("#aditivar_input_moeda").css("display","block");
+	}
+	else if(nome_campo=="valorMaterial"){
+		$("#aditivar_input_moeda input").mascara("moeda");
+		$("#aditivar_desc_moeda").css("display","block");
+		$("#aditivar_input_moeda").css("display","block");
+	}
+	else {//if(nome_campo=="prazoProjObra"){
+		$("#aditivar_desc_dia").css("display","block");
+		$("#aditivar_input_dia").css("display","block");
+	}
+	//querem q apenas o campo outros apareca
+	$("#aditivar_razao_outro").show();
+	$("#aditivar_razao").hide();
+	
+	//fim 003
 	$("#aditivar_dialog").dialog({
 		height: 250,
 		width: 500,
@@ -524,23 +567,33 @@ function show_aditivar_campo(nome_campo){
 //aditiva um campo
 function do_aditivar_campo(campo_nome) {
 	//deve ser especificada uma razão para aditivar
-	if(($("#aditivar_razao").val() == '_outro' && $("#aditivar_razao_outro").val() == '') || $("#aditivar_razao").val() == ''){
+	/**
+	 * Solicitacao 003
+	 * removemos o select de motivos
+	 */
+	if($("#aditivar_razao_outro").val() == ''){
 		alert("Por favor, selecione um motivo ou selecione Outros e especifique um motivo");
 		return;
 	}
-	//se a opcao escolhida for outro, deve ser salvo o campo texto
-	if($("#aditivar_razao").val() == '_outro'){
-		var razao = $("#aditivar_razao_outro").val();
-	} else {
-		//senao, salva o texto do select
-		var razao = $("#aditivar_razao").children("option[selected=selected]").html();
+	var razao = $("#aditivar_razao_outro").val();	
+	var valor = "";
+	if(campo_nome=="valorMaoObra"){
+		valor = $("#aditivar_valor_moeda").val().replace('.','').replace(',',',');
 	}
-	
+	else if(campo_nome=="valorMaterial"){
+		valor = $("#aditivar_valor_moeda").val().replace('.','').replace(',',',');
+	}
+	else if(campo_nome=="valorProj"){
+		valor = $("#aditivar_valor_moeda").val().replace('.','').replace(',',',');
+	}
+	else{ //if(nome_campo=="prazoProjObra"){
+		valor = $("#aditivar_valor").val()
+	}
 	//envia os dados para serem salvos
 	$.post('sgo.php?acao=aditivar_contrato',
 			{campo:campo_nome,
 			 contratoID:$("#docID").html(),
-			 valor:$("#aditivar_valor").val(),
+			 valor:valor,
 			 motivo: escape(razao)
 			},
 			function(data){
@@ -548,9 +601,16 @@ function do_aditivar_campo(campo_nome) {
 				data = JSON.parse(data);
 				//monta a linha de aditivo
 				if(data[0].success) {
+					window.location.href=window.location.href;//solicitacao 003 : gambiarra porca
 					$("#"+campo_nome+"_aditivos_div").append('<br /><span id="aditivo_valor_'+data[0].aditivoID+'">'+$("#aditivar_valor").val()+'</span> (<span id="aditivo_valor_porcentagem_'+data[0].aditivoID+'">'+data[0].novaPorcentagem+'</span> %) (Motivo: <span id="aditivo_motivo_'+data[0].aditivoID+'">'+razao+'</span>) <a href="javascript:void(0)" onclick="javascript:show_editar_aditivo('+data[0].aditivoID+',\''+campo_nome+'\')">[Editar]</a>');
 					$("#"+campo_nome+'_total_aditivos').html(data[0].novoValor);
 					$("#"+campo_nome+'_total_aditivos_porcentagem').html(data[0].novoTotalPorcentagem);
+					if(campo_nome == "prazoProjObra"){
+						var data_old = $("#dataTermino_val").html().split('/');//0 dia, 1 mes, 2 ano
+						var data_new = new Date(data_old[2],data_old[1]-1,data_old[0]);//mes deve ser decrementado em unidade
+						data_new.setDate(data_new.getDate()+parseInt(data[0].novoValor));
+						$("#dataTermino_val").html(data_new.getDate()+"/"+data.getMonth()+"/"+data.getFullYear());
+					}
 					//fecha o dialog
 					close_aditivo_dialog();
 				} else {
@@ -573,11 +633,44 @@ function close_aditivo_dialog(){
 //mostra dialog para editar um recurso inserido no sistema
 function show_editar_aditivo(aditivo_id,campo_nome){
 	//se eh editar, mostra o campo de texto
+	/**
+	 * Solicitacao 003
+	 */
+	$("div[attr='sw']").css('display','none');
+	var id="";
+	if(campo_nome=="valorMaoObra"){
+		id="#aditivar_valor_moeda";
+		$("#aditivar_input_moeda input").mascara("moeda");
+		$("#aditivar_desc_moeda").css("display","block");
+		$("#aditivar_input_moeda").css("display","block");
+	}
+	else if(campo_nome=="valorMaterial"){
+		id="#aditivar_valor_moeda";
+		$("#aditivar_input_moeda input").mascara("moeda");
+		$("#aditivar_desc_moeda").css("display","block");
+		$("#aditivar_input_moeda").css("display","block");
+	}
+	else if(campo_nome=="valorProj"){
+		id="#aditivar_valor_moeda";
+		$("#aditivar_input_moeda input").mascara("moeda");
+		$("#aditivar_desc_moeda").css("display","block");
+		$("#aditivar_input_moeda").css("display","block");
+	}
+	else {//if(nome_campo=="prazoProjObra"){
+		id="#aditivar_valor"
+		$("#aditivar_desc_dia").css("display","block");
+		$("#aditivar_input_dia").css("display","block");
+	}
+	//fim 003
 	$("#aditivar_razao_outro").show();
 	$("#aditivar_razao").hide();
 	//preenche os valores
-	$("#aditivar_valor").val($("#aditivo_valor_"+aditivo_id).html());
-	$("#aditivar_razao_outro").val($("#aditivo_motivo_"+aditivo_id).html());
+	var valor = parseFloat($("input[name='aditivo_valor_"+aditivo_id+"']").attr("value"));
+	if(valor%1===0 && id=="#aditivar_valor_moeda")//verifica se eh um inteiro
+		$(id).val(valor+",00");
+	else
+		$(id).val(valor);
+	$("#aditivar_razao_outro").val($("input[name='aditivo_motivo_"+aditivo_id+"']").attr("value"));
 	//mostra o dialog de aditivo
 	$("#aditivar_dialog").dialog({
 		height: 250,
@@ -601,12 +694,28 @@ function do_editar_aditivo(aditivo_id,campo_nome){
 		alert("Por favor, especifique um motivo");
 		return;
 	}
+	/**
+	 * Solicitacao 003
+	 */
+	var valor = "";
+	if(campo_nome=="valorMaoObra"){
+		valor = $("#aditivar_valor_moeda").val().replace('.','').replace(',',',');
+	}
+	else if(campo_nome=="valorMaterial"){
+		valor = $("#aditivar_valor_moeda").val().replace('.','').replace(',',',');
+	}
+	else if(campo_nome=="valorProj"){
+		valor = $("#aditivar_valor_moeda").val().replace('.','').replace(',',',');
+	}
+	else{ //if(nome_campo=="prazoProjObra"){
+		valor = $("#aditivar_valor").val()
+	}
 	//envia os novos dados do aditivo
 	$.post('sgo.php?acao=editar_aditivo', {
 			 contratoID:$("#docID").html(),
 			 campo: campo_nome,
 			 aditivoID: aditivo_id,
-			 valor: $("#aditivar_valor").val(),
+			 valor: valor,
 			 motivo: escape($("#aditivar_razao_outro").val())
 			},
 			function(data){
@@ -614,6 +723,7 @@ function do_editar_aditivo(aditivo_id,campo_nome){
 				data = JSON.parse(data);
 				//se foi bem sucedido
 				if(data[0].success) {
+					window.location.href=window.location.href;//solicitacao 003 : gambiarra porca
 					//atualiza os dados
 					$("#aditivo_valor_"+aditivo_id).html($("#aditivar_valor").val());
 					$("#aditivo_motivo_"+aditivo_id).html($("#aditivar_razao_outro").val());
@@ -621,6 +731,9 @@ function do_editar_aditivo(aditivo_id,campo_nome){
 					$("#aditivo_valor_porcentagem_"+aditivo_id).html(data[0].novaPorcentagem);
 					$("#"+campo_nome+'_total_aditivos').html(data[0].novoValor);
 					$("#"+campo_nome+'_total_aditivos_porcentagem').html(data[0].novoTotalPorcentagem);
+					if(campo_nome == "prazoProjObra"){
+						$("#dataTermino_val").html(somadias($('#dataTermino_val').html(),parseInt($("#aditivar_valor").val())));
+					}
 					//fecha o dialogo
 					close_aditivo_dialog();
 				} else {
@@ -628,4 +741,31 @@ function do_editar_aditivo(aditivo_id,campo_nome){
 					alert("Falha ao adicionar Aditivo: "+data[0].errorFeedback);
 				}
 			});
+}
+
+function numdias(mes,ano) {
+    if((mes<8 && mes%2==1) || (mes>7 && mes%2==0)) return 31;
+    if(mes!=2) return 30;
+    if(ano%4==0) return 29;
+    return 28;
+}
+
+function somadias(data, dias) {
+   data=data.split('/');
+   diafuturo=parseInt(data[0])+dias;
+   mes=parseInt(data[1]);
+   ano=parseInt(data[2]);
+   while(diafuturo>numdias(mes,ano)) {
+       diafuturo-=numdias(mes,ano);
+       mes++;
+       if(mes>12) {
+           mes=1;
+           ano++;
+       }
+   }
+
+   if(diafuturo<10) diafuturo='0'+diafuturo;
+   if(mes<10) mes='0'+mes;
+
+   return diafuturo+"/"+mes+"/"+ano;
 }
