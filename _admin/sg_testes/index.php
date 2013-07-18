@@ -59,7 +59,10 @@
 	
 	
 	$html->campos['codPag'] = showCodTela();
-	
+	//solicitacao 004: inserindo a tabela de alertas em um dialog
+	requireSubModule(array("frontend","alerta"));
+	$html->content[1].=getDialog();
+	//fim 004
 	$html->showPage();
 	$bd->disconnect();
 ?>

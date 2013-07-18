@@ -25,9 +25,33 @@
 	$html->menu = showMenu($conf['template_menu'],$_SESSION["perm"],1,$bd);
 	$html->campos['codPag'] = showCodTela();
 	
+	//solicitacao 004
+	if(isset($_REQUEST['getDatasAlerta'])&&$_REQUEST['getDatasAlerta']==true){
+		requireSubModule("alerta");
+		$s = new SysAlerta();
+		echo json_encode(array("tabela"=>$s->toHtmlTable()));
+		return;
+	}
+	else if(isset($_REQUEST['saveSysAlerta'])&&$_REQUEST['saveSysAlerta']==true){
+		requireSubModule("alerta");
+		//todos sao removiveis
+		$_REQUEST["removable"]=1;
+		$ini=intval($_REQUEST["ini"]);
+		$s = new SysAlerta();
+		$r = $s->insert(array(NULL,$_REQUEST["ini"],$_REQUEST["removable"]));
+		echo json_encode(array("success"=>true,"msg"=>"Alerta inserido com sucesso.","id"=>$r));
+		return;
+	}
+	else if(isset($_REQUEST["removeSysAlerta"])&&$_REQUEST["removeSysAlerta"]==true){
+		requireSubModule("alerta");
+		$s = new SysAlerta();
+		$r = $s->remove("id",explode(",",$_REQUEST["id"])," IN ");
+		echo json_encode(array("msg"=>$r));
+		return;
+	}
+	
 	//o encadeamento de condicoes abaixo redirecionam o fluxo para a secao sendo visitada.
 	//ao chegar na cadeia correta, montam-se o caminho e chama-se a funcao para gerar o conteudo da pagina
-	
 	if (isset($_GET['area'])) {
 		/*DOCUMENTOS*/	
 		if ($_GET['area'] == 'dc'){
@@ -56,13 +80,14 @@
 /*ATRBOBRA*/} elseif (isset($_GET['acao']) && $_GET['acao'] == 'atribObra') {
 				$html->path = showNavBar(array(array("url" => "adm.php","name" => "Administra&ccedil;&atilde;o do Sistema"),array("url" => "adm.php?area=dc&amp;acao=geren","name" => "Gerenciar Documentos"),array("url" => "","name" => "Gerenciar Atribui&ccedil;&atilde;o a Obras")));
 				$html->content[1] = showDocAtribObra($bd);
-/*SALVAATR*/} elseif (isset($_GET['acao']) && $_GET['acao'] == 'salvaAtr') {
+/*SALVAATR*/}
+			elseif (isset($_GET['acao']) && $_GET['acao'] == 'salvaAtr') {
 				$html->path = showNavBar(array(array("url" => "adm.php","name" => "Administra&ccedil;&atilde;o do Sistema"),array("url" => "adm.php?area=dc&amp;acao=geren","name" => "Gerenciar Documentos"),array("url" => "","name" => "Salvar Atribui&ccedil;&atilde;o a Obras")));
 				$html->content[1] = salvaDocAtribObra($_POST, $bd);
-/*GERENCIAR*/} else {
+/*GERENCIAR*/}
+			else {
 				$html->path = showNavBar(array(array("url" => "adm.php","name" => "Administra&ccedil;&atilde;o do Sistema"),array("url" => "","name" => "Gerenciar Documentos")));
-				$html->content[1] = showTiposDocs($bd);
-				
+				$html->content[1] = showTiposDocs($bd);	
 			}
 
 		/*GRUPOS*/	
@@ -116,6 +141,10 @@
 				$html->path = showNavBar(array(array("url" => "adm.php","name" => "Administra&ccedil;&atilde;o do Sistema"),array("url" => "adm.php?area=pe&amp;acao=geren","name" => "Gerenciar Permiss&otilde;es"),array("url" => "","name" => "Salvar Permiss&otilde;es")));
 				$html->content[1] = salvaPermissoes($bd);
 			}
+			else if($_REQUEST['acao']=='gerenAlerta'){//solicitacao 004
+				$html->path = showNavBar(array(array("url" => "adm.php","name" => "Administra&ccedil;&atilde;o do Sistema"),array("url" => "","name" => "Gerenciar Alertas")));
+				$html->content[1] = gerenciarAlertas();
+			}
 
 		/*EMPRESAS*/
 		} elseif ($_GET['area'] == 'em'){				
@@ -163,7 +192,7 @@
 	 * @return string codigo HTML da pagina
 	 */
 	function geraIndiceAdm(){
-		// adicionar: adm.php?area=dc&amp;acao=novo
+		// adicionar: adm.php?area=dc&amp;acao=nov
 		$html = '
 		<script type="text/javascript" src="scripts/jquery.tools.min.js?r={$randNum}"></script>
 		<h3>Administrar Documentos</h3>
@@ -180,6 +209,7 @@
 		&nbsp;&nbsp;<a href="adm.php?area=un&amp;acao=atual">Atualizar lista de Unidades/&Oacute;rg&atilde;os</a><br />
 		<h3>Administrar Permiss&otilde;es</h3>
 		&nbsp;&nbsp;<a href="adm.php?area=pe&amp;acao=geren">Gerenciar Permiss&otilde;es</a><br />
+		&nbsp;&nbsp;<a href="adm.php?area=pe&amp;acao=gerenAlerta">Gerenciar Alertas</a><br />
 		<h3>Administrar Empresas</h3>
 		&nbsp;&nbsp;<a href="adm.php?area=em&amp;acao=geren">Gerenciar empresas</a><br />
 		&nbsp;&nbsp;<a href="adm.php?area=em&amp;acao=addnv">Adicionar nova empresa</a><br />
@@ -340,6 +370,27 @@
 								</tr>';
 			}
 		}
+		//solicitacao 004: campo alerta
+		$campoAlerta = "";
+		if($tipo=='contr'){
+			//submodulo
+			requireSubModule(array("frontend","alerta"));
+			//campo alerta, link para gerenciar alertas (abrir dialog)
+			$campoAlerta = new HtmlTag("a", "", "","Gerenciar Alertas");
+			$campoAlerta->setAttr(array("href","onclick"), array("#","javascript:gerenciarContratoAlerta();"));
+			//preparando dialog para gerenciar alertas
+			$dialog = new HtmlTag("div", "dialogGerenciarAlerta", "");
+			$dialog->setStyle("display", "none");
+			//campos para adicionar um novo alerta de sistema
+			$sa = new SysAlerta();
+			$dialog->setChildren(new HtmlTag("span", "respServerSysAlerta", "","",new HtmlTagStyle("font-color","red")));
+			$dialog->setChildren($sa->getAddHtmlFields());
+			//dialog esta compreendido no campo alerta
+			$campoAlerta->setNext($dialog);
+			//link campo alerta 	
+			$campoAlerta = $campoAlerta->toString();
+		}
+		//fim 004
 		//codigo HTML do formulario de edicao do tipo de documento
 		$html = '<script type="text/javascript" src="scripts/adm.js?r={$randNum}"></script>
 			<form accept-charset="'.$conf['charset'].'" action="adm.php?area=dc&amp;acao=salvar" method="post"><input type="hidden" name="action" value="'.$_GET['acao'].'" />
@@ -355,6 +406,10 @@
 						<td><b>Nome Abreviado</b> (at&eacute; 5 caracteres):</td>
 						<td>'.$nomeAbrv.'</td>
 					</tr>
+					<tr>
+						<td><b>Alerta</b>:</td>
+						<td>'.$campoAlerta.'</td>
+					</tr>			
 					<tr>
 						<td><b>Campos:</b></td>
 						<td>
@@ -611,7 +666,9 @@
 		$cat = $bd->query("SELECT cat FROM label_acao GROUP BY cat ORDER BY cat ASC");
 		$cat_nomes = array("sga" => "Administra&ccedil;&atilde;o", "sgd" => "Documentos", "sge" => "Empresas", "sgo" => "Empreendimentos e obras", "sgp" => "Funcion&aacute;rios");
 		$subcat_nomes['sgd']['proc'] = 'Processo'; $subcat_nomes['sgd']['ofi'] = 'Oficio CPO'; $subcat_nomes['sgd']['ofe'] = 'Oficio Externo';
-		$subcat_nomes['sgd']['it'] = 'I.T.'; $subcat_nomes['sgd']['contr'] = 'Contrato'; $subcat_nomes['sgd']['sap'] = 'SAP';
+		$subcat_nomes['sgd']['it'] = 'I.T.'; 
+		$subcat_nomes['sgd']['contr'] = 'Contrato'; 
+		$subcat_nomes['sgd']['sap'] = 'SAP';
 		$subcat_nomes['sgd']['memo'] = 'Memorando'; $subcat_nomes['sgd']['resp'] = 'Resposta'; $subcat_nomes['sgd']['rr'] = 'Relacao de Remessa';
 		
 		foreach ($cat as $c) {
@@ -1574,5 +1631,43 @@
 		}
 		
 		return 'N&atilde;o existe nenhum tipo de documento cadastrado no banco de dados.';
+	}
+	/**
+	 * Funcao que trz o front da gerencia de alertas
+	 * @param BD $bd
+	 */
+	function gerenciarAlertas(){
+		requireSubModule(array("alerta","frontend"));
+		$divParent = new HtmlTag("div", "gerenAlertas", "");
+		$divDAO = new HtmlTag("div", "daoAlertas", "");
+		$input = new HtmlTag("input", "autoUserNome", "");
+		$input->setAttr(array("attr","name"), array("autocomplete","usuario.nome"));
+		$salvar = new HtmlTag("a", "", "","[Salvar]");
+		$salvar->setAttr(array("href","onclick"), array("#","javascript:salvarGerenciaAlertas();"));
+		$input->setNext($salvar);
+// 		$divDAO->setChildren($input);
+		$span = new HtmlTag("span", "", "");
+		$link = new HtmlTag("a", "", "", "[Remover]");
+		$link->setAttr(array("href","onclick"), array("#","javascript:removerGerenciaAlertas();"));
+		$span->setVar("content", "Para todos os usu&aacute;rios selecionados: ".$link->toString());
+		$table = new HtmlTable("gerenAlertasUsers", "tablesorter", 1);
+		$table->enableCheckbox();
+		$table->setHead("Nome","c header ");
+		//selecionando os users
+		$u = new UsuarioAlerta();
+		$users = $u->select();
+		foreach ($users as $vu){
+			$hidden = new HtmlTag("input", "", "");
+			$hidden->setAttr(array("type","name","value"), array("hidden","usuarioAlertaID",$vu["uaid"]));
+			$hidden->setNext(new HtmlTag("input", "", "","",null,new HtmlTagAttr(array("type","name","value"), array("hidden","lid","gerenAlertasUsers_".($table->getNumLines())))));
+			$table->appendLine($vu["nomeCompl"],"",$hidden);
+		}
+		$divDAO->setChildren($input);
+		$divDAO->setChildren(new HtmlTag("br", "", ""));
+		$divDAO->setChildren(new HtmlTag("br", "", ""));
+		$divDAO->setChildren($span);
+		$divDAO->setChildren(new HtmlTag("br", "", ""));		
+		$divDAO->setChildren($table);
+		return $divDAO->toString();
 	}
 ?>

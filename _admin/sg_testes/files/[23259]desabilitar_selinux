@@ -1,0 +1,6 @@
+$ arquivo /etc/selinux/config
+#desabilitando o SELINUX
+SELINUX=disabled
+SETLOCALDEFS=0
+SELINUXTYPE=targeted
+

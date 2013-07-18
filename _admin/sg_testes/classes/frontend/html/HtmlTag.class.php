@@ -88,7 +88,7 @@ class HtmlTag implements HtmlTagIF {
 	}
 	
 	public function getVar($var){
-		return (property_exists("HtmlTag", $var))?$this->$var:null;
+		return (isset($this->$var))?$this->$var:null;
 	}
 	
 	public function setVar($var,$val){
@@ -170,6 +170,8 @@ class HtmlTag implements HtmlTagIF {
 			case 'input':
 				return '';
 			case 'img':
+				return '';
+			case 'br':
 				return '';
 			default:
 				return "</$this->type>";

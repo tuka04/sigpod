@@ -142,7 +142,11 @@ class Documento {
 	 */
 	function __construct($id){
 		global $bd;
-		$this->bd = $bd;
+		if(!is_object($bd)){
+			//solicitacao 004: dava bub pois a global era NULL, entao nesse caso reconstruimos o obj
+			$bd = new BD();
+		}
+		$this->bd = $bd;	
 		$this->id = $id;
 	}
 	
@@ -150,7 +154,7 @@ class Documento {
 	 * carrega dados do documento comuns a todos os documentos (DOC)
 	 */
 	function loadDados($dados = null) {
-		if(!$this->bd){
+		if(!$this->bd || !is_object($this->bd)){
 			global $bd;
 			$this->bd = $bd;
 		}
@@ -642,6 +646,7 @@ class Documento {
 	 */
 	function doLogHist($userID, $acao, $despacho, $unidade, $tipo, $volumes, $label,$doc_targetID = 0){
 		$hist = HistFactory::novoHist('doc', $this->bd);
+
 		$hist->set('docID', $this->id);
 		$hist->set('acao', $acao);
 		$hist->set('userID', $userID);
@@ -658,7 +663,6 @@ class Documento {
 			$this->ultimoHist = $ret;
 			$this->update('ultimoHist', $ret);
 		}
-		
 		return $ret;
 	}
 	

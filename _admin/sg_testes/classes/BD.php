@@ -5,7 +5,7 @@
 	 * @author Mario Akita
 	 * @desc lida com o requisicoes para o BD
 	 */
-require_once "BD/DAO/interfaces/DAO.class.php";
+require_once "BD/DAO/DAO.class.php";
 class BD {
 	/**
 	 * string que contem o host
@@ -49,7 +49,6 @@ class BD {
 	public function __construct($login = '', $password = '', $host = '', $table = '') {
 		global $conf;
 		
-		
 		$this->host = $conf['DBhost'];
 		$this->port = $conf['DBport'];
 		$this->login = $conf['DBLogin'];
@@ -62,8 +61,8 @@ class BD {
 
 		if(@fsockopen($this->host['master'], $this->port, $erroNo, $erroMsg, 1)) {
 			$this->conn = mysql_connect($this->host['master'].':3306', $this->login, $this->password) or die("Impossivel conectar ao master: ".mysql_error()); 
-			
 			if($this->conn) {
+				
 				$success = true;
 				if($conf['debugMode']){print 'master';}
 			}
@@ -88,6 +87,7 @@ class BD {
 	}
 	
 	/**
+	 * Solicitacao 003
 	 * Método que faz o replace de tokens que estao na query
 	 * @param string $sql
 	 */

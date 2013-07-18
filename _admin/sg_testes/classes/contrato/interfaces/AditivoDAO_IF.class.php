@@ -8,8 +8,8 @@
 * @desc classe que manipula os aditivos de um contrato
 * @see Acesso e querys aos bancos de dados
 */
-require_once "BD/DAO/interfaces/DAO.class.php";
-interface AditivoDAO_IF extends DAO{
+require_once "BD/DAO/interfaces/DAOIF.class.php";
+interface AditivoDAO_IF extends DAOIF{
 	const CAMPOS = "id,contratoID,campo,valor,motivo";//campos separados por virgula
 	const TABELA = "contrato_aditivo";
 } 

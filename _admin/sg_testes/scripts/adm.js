@@ -191,3 +191,147 @@ function excluirCampo(nome){
 function closeCampo(){
 	$("#configCampo").slideUp();
 }
+//solicitacao 004
+function gerenciarContratoAlerta(){
+	//construcao da tabela de gerencia
+	$.ajax({
+		  type:"POST",
+		  url: "adm.php",
+		  data:{getDatasAlerta:true},
+		  cache: false,
+		  dataType: "json",
+		  success: function(data){
+			  var $el = $("#dialogGerenciarAlerta");
+			  $el.children("span").remove();
+			  $el.children("br").remove();
+			  $("#tableAlerta").remove();
+			  $el.append(data.tabela);
+			  $el.dialog({
+				 title:"Administração de alerta contratual",
+				 modal:true,
+				 autoOpen:true,
+				 width:350,
+				 height:180,
+			  });
+			  $('#tableAlerta').tablesorter({ 
+					headers: { 0:{sorter:false}} 
+				}); 
+			  $('#tableAlerta input[type="checkbox"]').enableCheckboxRangeSelection();
+		  }
+	});
+}
+
+function gerenciarContratoOpenAdd(id1,id2,rm){
+	var $el = $('#'+id1);
+	var $ela = $('#'+id2);
+	var $rm = $('#'+rm);
+	$el.show("slide",{direction:"left"},500);
+	$ela.show("slide",{direction:"left"},500);
+	$rm.hide();
+	$("#respServerSysAlerta").html("");
+}
+function gerenciarContratoCancel(rm1,rm2,id,name){
+	var $el = $('#'+rm1);
+	var $ela = $('#'+rm2);
+	var $rm = $('#'+id);
+	var $val = $("input[name='"+name+"']");
+	$val.attr("value","Dias");
+	$val.css("opacity","0.5");
+	$el.hide("slide",{direction:"right"},200);
+	$ela.hide("slide",{direction:"right"},200);
+	$rm.delay(200).show("slide",{direction:"left"},500);
+}
+function gerenciarContratoClearValue(name){
+	var val = $("input[name='"+name+"']").attr('value');
+	if(val=="Dias"){
+		$("input[name='"+name+"']").attr('value','');
+		$("input[name='"+name+"']").css('opacity','1');
+	}
+}
+function gerenciarContratoSave(name,check){
+	var $n = $("input[name='"+name+"']");
+	var $c = $("input[name='"+check+"']");
+	var c=$c.is(":checked")?1:0;
+	var exp = /^-?\d\d*$/;
+	if(!exp.test($n.attr("value"))){
+		alert("Por favor, utilize apenas números maiores que zero e inteiro. Exemplo: 10 ou 36");
+		return;
+	}
+	var val = $n.attr("value");
+	$.ajax({
+		  type:"POST",
+		  url: "adm.php",
+		  data:{saveSysAlerta:true,ini:val,diario:c},
+		  cache: false,
+		  dataType: "json",
+		  success: function(data){
+			  if(data.success=='true'||data.success==true){
+				  $("#respServerSysAlerta").html("Registro inserido com sucesso.");
+				  var num_lin = $("#tableAlerta tbody").children().length;//num de linhas
+				  var tr = '<tr id="tableAlerta_'+num_lin+'">';
+				  var l1='<td><input type="checkbox" id="chk_'+num_lin+'"/>'//linha 1 checkbox
+				  		 +'<input type="hidden" name="aid" value="'+data.id+'"/>'
+				  		 +'<input type="hidden" name="lid" value="tableAlerta_'+num_lin+'"/>';
+				  var l2='<td>'+data.id+'</td>';
+				  var l3='<td>'+val+'</td>';
+				  $("#tableAlerta tbody").append(tr+l1+l2+l3+"</tr>");
+				  gerenciarContratoCancel("sys_alerta_campos","bsc_sys_alerta","addSysAlerta","sys_alerta.ini");
+			  }
+			  else{
+				  $("#respServerSysAlerta").html(data.msg);
+			  }
+		  }
+	});
+}
+function removeSysAlerta(tr,id){
+	var aid = new Array();
+	var lid = new Array();
+	$("#tableAlerta input[type=checkbox]").each(function(){
+		if(this.checked){
+			aid.push($(this).parent().children('input[type="hidden"][name="aid"]').attr('value'));
+			lid.push($(this).parent().children('input[type="hidden"][name="lid"]').attr('value'));
+		}
+	});
+	if(aid.length==0){
+		alert("Por favor, selecione pelo menos um alerta.");
+		return;
+	}
+	$el = $("#rmAlertaSysAlerta");
+	if(!$el.attr('id')){
+		var html = "<div id='rmAlertaSysAlerta'>Deseja remover o alerta de código: "+aid.toString()+"</div>";
+		$('body').append(html);
+		$el = $("#rmAlertaSysAlerta");
+	}
+	else{
+		$("#rmAlertaSysAlerta").html("Deseja remover o alerta de código: "+aid.toString()+"</div>");
+	}
+	$el.dialog({
+		type:"POST",
+		resizable: false,
+		height:140,
+		modal: true,
+		autoOpen:true,
+		buttons: {
+			"Sim": function() {
+				$.ajax({
+					  url: "adm.php",
+					  data:{removeSysAlerta:true,id:aid.toString()},
+					  cache: false,
+					  dataType: "json",
+					  success: function(data){
+						  if(data.msg=='true'||data.msg==true){
+							  $("#respServerSysAlerta").html("Registro removido com sucesso.");
+							  for(var i in lid)
+								  $("#"+lid[i]).remove();
+						  }
+					  }
+				});
+				$( this ).dialog( "close" );
+			},
+			"Não": function() {
+				$( this ).dialog( "close" );
+			}
+		}
+	})
+	
+}

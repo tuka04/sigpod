@@ -359,6 +359,9 @@ class Historico_Doc extends historico {
 				}
 			}
 		}
+		elseif ($this->get('tipo') == 'rmAlerta'){//solicitacao 004
+			$acao = 'Removeu o alerta desse contrato.';
+		}
 		else {
 			$acao = $this->get('acao');
 		}
@@ -393,6 +396,8 @@ class Historico_Doc extends historico {
 		/**
 		 * fim
 		 */
+		//solicitacao 004
+		$array['rmAlerta'] = 'Removeu o alerta desse contrato.';
 		
 		return $array;
 	}

@@ -3,7 +3,14 @@
 	include_once('sgd_modules.php');
 	include_once('classes/adLDAP/adLDAP.php');
 	include_once('classes/PHPExcel.php');
+	
 	includeModule('sgo');
+	requireSubModule(array("alerta","aditivo"));
+	global $conf;
+	include_once('conf.inc.php');
+	$a = new Alerta();
+	echo $a->getTable()->toString();
+	
 	//phpinfo();exit();
 	//$bd = new BD($conf["DBLogin"], $conf["DBPassword"], $conf["DBhost"], $conf["DBTable"]);
 	//phpinfo(); exit();

@@ -29,7 +29,8 @@ class Aditivo extends AditivoDAO implements AditivoIF{
 	private $docId;
 	
 	public function Aditivo($bd,$docId,$nome="",$label="",$tipo="",$valor="",$motivo=""){
-		parent::AditivoDAO($bd);
+		if($bd!=null)
+			parent::AditivoDAO($bd);
 		if(count(func_get_args())==0){
 			$this->instantiate();//instacie os objetos apenas.
 			return;
@@ -47,6 +48,9 @@ class Aditivo extends AditivoDAO implements AditivoIF{
 			$this->valor->append($valor);
 			$this->motivo->append($motivo);
 		}
+	}
+	public function DAO($tabela="",$campos=""){
+		//nada a fazer
 	}
 	/**
 	 * instacia novos objetos (atributos q sao objetos)
@@ -111,6 +115,20 @@ class Aditivo extends AditivoDAO implements AditivoIF{
 		foreach ($valores as $v)
 			$total+=$v;
 		return $total;
+	}
+	/**
+	 * Metodo, estatico, que retorna TODOS os aditivos presentes na tabela
+	 * @return array()
+	 */
+	public static function getAllAditivos(){
+		//buscar por algum prazo...prazoContr, prazoProjObra
+		$w = "WHERE contrato_aditivo.campo LIKE '%prazo%'";//where clause
+		$qr = str_replace(DAO::TOKEN_TABELA, self::TABELA, DAO::SELECT);
+		$qr = str_replace(DAO::TOKEN_CAMPOS, self::CAMPOS, $qr);
+		$qr = str_replace(DAO::TOKEN_WHERE, $w, $qr);
+		$bd = new BD();
+		$rqr = $bd->query($qr);
+		return $rqr;
 	}
 } 
 /**

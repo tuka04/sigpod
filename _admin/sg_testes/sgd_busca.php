@@ -607,13 +607,15 @@ foreach ($res as $r) {
 		}
 	}
 	if (isset($d['dataTermino'])) {
+		
 		if ($d['dataTermino'] != 0) {
 			$contr = new Contrato($d["id"]);
-			requireSubModule("aditivo");
-// 			$ad = $contr->getAditivos("prazoProjObra");
+			requireSubModule(array("aditivo","frontend"));
 			$at = new Aditivo($contr->bd, $contr->id);
+			
 			$a = new Aditivo($contr->bd, $contr->id, "prazoProjObra");
 			$ad = $a->getAditivos();
+			
 			foreach ($ad as $v)
 				$at->setVar("valor", $v["valor"]);
 			$a = new Aditivo($contr->bd, $contr->id, "prazoContr");
@@ -625,6 +627,7 @@ foreach ($res as $r) {
 			
 			$d['dataTermino'] = date("d/m/Y", strtotime("+".$dias." days",strtotime($d['dataTermino'])));
 			//somando os aditivos à data
+			
 		}
 		else {
 			$d['dataTermino'] = "---";

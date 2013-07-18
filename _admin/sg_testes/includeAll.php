@@ -101,13 +101,23 @@
 			$nameArray[] = $name;
 		else
 		$nameArray=$name;
-		foreach ($nameArray as $n)
-		if($n=='aditivo'){
-			require_once 'classes/contrato/Aditivo.class.php';
-		}
-		else if($n=='frontend'){
-			require_once 'classes/frontend/html/HtmlTag.class.php';
-			require_once 'classes/frontend/html/HtmlTable.class.php';
+		foreach ($nameArray as $n){
+			if($n=='aditivo'){
+				require_once 'classes/contrato/Aditivo.class.php';
+			}
+			else if($n=='frontend'){
+				require_once 'classes/frontend/html/HtmlTag.class.php';
+				require_once 'classes/frontend/html/HtmlTagStyle.class.php';
+				require_once 'classes/frontend/html/HtmlTagAttr.class.php';
+				require_once 'classes/frontend/html/HtmlTable.class.php';
+			}
+			else if($n=='alerta'){
+				require_once 'alerta.php';
+				require_once 'classes/system/alerta/SysAlerta.class.php';
+				require_once 'classes/contrato/alerta/Alerta.class.php';
+				require_once 'classes/contrato/alerta/Vencimento.class.php';
+				require_once 'classes/usuario/alerta/UsuarioAlerta.class.php';
+			}
 		}
 	}
 	

@@ -20,7 +20,12 @@ class HtmlTable extends HtmlTag{
 	 * @var HtmlTag
 	 */
 	private $body;
-		
+	/**
+	 * Se a tabela contem os checkbox a direita
+	 * @var boolean
+	 */
+	private $checkbox = false;
+	
 	public function HtmlTable($id,$class,$num_cols){
 		parent::HtmlTag("table", $id, $class);
 		$this->head=new HtmlTag("thead", "", "");
@@ -30,14 +35,55 @@ class HtmlTable extends HtmlTag{
 		$this->setChildren($this->body);
 	}
 	
-	public function appendLine($val){
+	public function enableCheckbox(){
+		$this->checkbox = true;	
+	}	
+		
+	public function setHead($val,$class=""){
 		if(count($val)!=$this->num_cols)//erro
 			die("Numero de colunas nao bate com o numero de valores");
+		if(!is_array($val)){
+			$single_val = $val;
+			$val = array();
+			array_push($val, $single_val);
+		}
+		if($this->head==null)//thead nao existe?
+			$this->head = new HtmlTag("thead", "", $class);
+		//caso tenha o checkbox
+		if($this->checkbox){
+			$this->head->setChildren(new HtmlTag("th","","",""));
+		}
+		foreach ($val as $v){
+			if(empty($v))
+				$this->head->setChildren(new HtmlTag("th", "", "",$v));
+			else 
+				$this->head->setChildren(new HtmlTag("th", "", $class,$v));
+		}
+	}
+	/**
+	 * @param array $val
+	 * @param string $class
+	 * @param HtmlTag $hidden 
+	 */
+	public function appendLine($val,$class="",HtmlTag $hidden=null){
+		if(count($val)!=$this->num_cols)//erro
+			die("Numero de colunas nao bate com o numero de valores");
+		if(!is_array($val)){
+			$single_val = $val;
+			$val = array();
+			array_push($val, $single_val);
+		}
 		if($this->body==null)//tbody nao existe?
 			$this->body = new HtmlTag("tbody", "", "");
-		$tr = new HtmlTag("tr", $this->getVar("id")."_".$this->num_lines, "");//nova linha
+		$tr = new HtmlTag("tr", $this->getVar("id")."_".$this->num_lines, $class);//nova linha
 		$this->body->setChildren($tr);
-		$td = array();
+		//caso tenha o checkbox
+		if($this->checkbox){
+			$check = new HtmlTag("input", "chk_".$this->num_lines, "");
+			$check->setAttr(array("type"), array("checkbox"));
+			$check->setChildren($hidden);
+			$tr->setChildren(new HtmlTag("td", "", "",$check->toString()));
+		}
 		foreach ($val as $v)
 			$tr->setChildren(new HtmlTag("td", "", "",$v));
 		$this->num_lines++;

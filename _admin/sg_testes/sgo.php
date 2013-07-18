@@ -4,7 +4,7 @@
 	 * @version 0.0 20/4/2011
 	 * @package geral
 	 * @author Mario Akita
-	 * @author Leandro Kümmel Tria Mendes
+	 * @author Leandro Kï¿½mmel Tria Mendes
 	 * @desc pagina que lida com os modulos de gerenciamento de obras
 	 */
 	include_once('includeAll.php');
@@ -408,8 +408,8 @@
 				if (isset($_GET['restaurar']) && ($_GET['restaurar'] == true || $_GET['restaurar'] == 'true')) {
 					$restaurar = true;
 				}
-				
 				$html->content[2] = $sgo->montaVerContrato($html, $_GET['empreendID'], $bd, $restaurar);
+				
 			}
 			else {
 				$html->content[2] = verObraFeedback(array("success" => false, "errorNo" => 1, "errorFeedback" => "Nenhuma obra ou empreendimento selecionados"));

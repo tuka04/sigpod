@@ -392,8 +392,12 @@ class Pessoa{
 	 * @param int $gid
 	 */
 	function getPermission($gid = -1,$bd = null) {
-		if($bd == null) {
-			global $bd;
+		if($bd == null || $bd == NULL || !is_object($bd)) {
+			global $bd;//solicitacao 004
+			if($bd==NULL){
+				global $conf;
+				$bd = new BD();
+			}
 		}
 		/*
 		//seleciona as permissoes do grupo ao qual o usuario pertence

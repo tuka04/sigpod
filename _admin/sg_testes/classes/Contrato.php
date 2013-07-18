@@ -560,11 +560,17 @@ class Contrato extends Documento {
 			
 			// seta tipo do processo
 			$tipo = 'Contrata&ccedil;&atilde;o de Obra';
+			//solicitacao 005: verifica se a key existe antes de acessa-la
+			if(!array_key_exists("tipoProc", $doc->campos))
+				$doc->campos['tipoProc'] = '';
 			if ($doc->campos['tipoProc'] == 'contrProj')
 				$tipo = 'Contrata&ccedil;&atilde;o de Projeto';
 			
 			// seta se é guardachuva
 			$guardachuva = "N&atilde;o";
+			//solicitacao 005: verifica se a key existe antes de acessa-la
+			if(!array_key_exists("guardachuva", $doc->campos))
+				$doc->campos['guardachuva'] = '';
 			if ($doc->campos['guardachuva'] == 1) {
 				$guardachuva = "Sim";
 			}
@@ -575,7 +581,9 @@ class Contrato extends Documento {
 			$link .= $conf["newWindowHeight"].'+\',scrollbars=yes,resizable=yes\').focus()">';
 			
 			$onclick = '';
-			
+			//solicitacao 005: verifica se a key existe antes de acessa-la
+			if(!array_key_exists("unOrgProc", $doc->campos))
+				$doc->campos['unOrgProc'] = '';
 			if (count($doc->getObras()) <= 0) {
 				$onclick = 'onclick="showInclObraForm('.$p['id'].', \''.$doc->campos['tipoProc'].'\', ';
 				$onclick .= $doc->campos['guardachuva'].', \''.str_replace(array("\n", "\r"), array("", ""), $doc->campos['unOrgProc']).'\')"';
@@ -584,7 +592,9 @@ class Contrato extends Documento {
 				$onclick = 'onclick="showOrigemRecForm('.$p['id'].', \''.$doc->campos['tipoProc'].'\', undefined, ';
 				$onclick .= $doc->campos['guardachuva'].', \''.str_replace(array("\n", "\r"), array("", ""), $doc->campos['unOrgProc']).'\')"';
 			}
-			
+			//solicitacao 005: verifica se a key existe antes de acessa-la
+			if(!array_key_exists("assunto", $doc->campos))
+				$doc->campos['assunto'] = '';
 			// monta linha da tabela
 			$tabela .= '
 			<tr class="c">
@@ -1048,7 +1058,6 @@ class Contrato extends Documento {
 		//fim 003
 		// monta tabelas para mostrar campos do contrato
 		foreach ($campos as $c) {
-
 			$aditivo_div = '';
 			$tabela = 'tabelaEsq';
 			if (Contrato::campoNaDireita($c)) {
@@ -1058,6 +1067,7 @@ class Contrato extends Documento {
 				
 				if ($c == 'empresaID') continue;
 				$c = montaCampo($c,'edt',$doc->campos);
+
 				if ($c['nome'] == "numProcContr") {
 					$link = "<a onclick=\"window.open('sgd.php?acao=ver&docID=".$docPai->id;
 					$link .= "','doc','width='+screen.width*".$conf["newWindowWidth"]."+',height='+screen.height*";
@@ -1100,16 +1110,16 @@ class Contrato extends Documento {
 								$totAd = $ad->getSum();
 								if($totAd>0){
 									$total+=$totAd;
-									if($totAd==1)
-										$unity=" dia";
-									$sumAdTag = new HtmlTag("span", "", ""," (+) ".$totAd.$unity." Aditivo ".$ad->getVar("label"));//soma dos aditivos
-									$sumAd .= "<br/>".$sumAdTag->toString();
+// 									if($totAd==1)
+// 										$unity=" dia";
+// 									$sumAdTag = new HtmlTag("span", "", ""," (+) ".$totAd.$unity." Aditivo ".$ad->getVar("label"));//soma dos aditivos
+// 									$sumAd .= "<br/>".$sumAdTag->toString();
 								}
 							}
 							$unity=" dias";
-							$sumAd .= "<hr>";
+// 							$sumAd .= "<hr>";
 							$total = date('d/m/Y', strtotime("+".$total." days",strtotime(str_replace("/", "-", $c["valor"]))));
-							$sumAdTag = new HtmlTag("span", "", ""," (=) ".$total,new HtmlTagStyle("font-weight","bold"));//soma dos aditivos
+							$sumAdTag = new HtmlTag("span", "", ""," ".$total,new HtmlTagStyle("font-weight","bold"));//soma dos aditivos
 							$sumAd .= $sumAdTag->toString();
 						}
 						else if($c["nome"]=="valorTotal"){
@@ -1121,30 +1131,66 @@ class Contrato extends Documento {
 								$totAd = $ad->getSum();
 								if($totAd>0){
 									$total+=$totAd;
-									$sumAdTag = new HtmlTag("span", "", ""," (+) R$ ".number_format($totAd, 2, ',', '.')." Aditivo ".$ad->getVar("label"));//soma dos aditivos
-									$sumAd .= "<br/>".$sumAdTag->toString();
+// 									$sumAdTag = new HtmlTag("span", "", ""," (+) R$ ".number_format($totAd, 2, ',', '.')." Aditivo ".$ad->getVar("label"));//soma dos aditivos
+// 									$sumAd .= "<br/>".$sumAdTag->toString();
 								}
 							}
-							$sumAd .= "<hr>";
-							$sumAdTag = new HtmlTag("span", "", ""," (=) R$ ".number_format($total, 2, ',', '.'),new HtmlTagStyle("font-weight","bold"));//soma dos aditivos
+// 							$sumAd .= "<hr>";
+							$sumAdTag = new HtmlTag("span", "", ""," R$ ".number_format($total, 2, ',', '.'),new HtmlTagStyle("font-weight","bold"));//soma dos aditivos
 							$sumAd .= $sumAdTag->toString();
 						}
 						else
 							$sumAd="";
 						//fim 003
-						$$tabela .= '
-						<tr class="c">
-							<td class="c"><b>'.$c['label'].':</b> </td>
-							<td class="c" id="'.$c['nome'].'_value_tr">';
-						if(isset($c['extra']) && strpos($c['extra'], 'moeda') !== false)
-							$$tabela .= 'R$ <span id="'.$c['nome'].'_val">'.number_format($c['valor'], 2, ',', '.').'</span>';
+						//003.5 : mudancas no layout
+						if($c["nome"]=="valorProj"||$c["nome"]=="valorMaoObra"||$c["nome"]=="valorMaterial"){
+							$href="javascript:void(0)";
+							$onclick='javascript:show_aditivar_campo("'.$c['nome'].'")';
+							$aditivarDAO = new HtmlTag("a", "", "","[Aditivo]",null,new HtmlTagAttr(array("href","onclick"),array($href,$onclick)));
+							$labelTB = new HtmlTable(rand(0, 100000), "", 1);
+							$labelTB->appendLine("<b>".$c["label"]."</b>");
+							$labelTB->appendLine($aditivarDAO->toString());
+							$label = new HtmlTag("td", "", "c");
+							$label->setVar("content", $labelTB->toString());
+						}
+						else if($c["nome"]=="prazoProjObra"||$c["nome"]=="prazoContr"){
+							$href="javascript:void(0)";
+							$onclick='javascript:show_aditivar_campo("'.$c['nome'].'")';
+							$aditivarDAO = new HtmlTag("a", "", "","[Aditivo]",null,new HtmlTagAttr(array("href","onclick"),array($href,$onclick)));
+							$labelTB = new HtmlTable(rand(0, 100000), "", 1);
+							$labelTB->appendLine("<b>".$c["label"]."</b>");
+							$labelTB->appendLine($aditivarDAO->toString());
+							$label = new HtmlTag("td", "", "c");
+							$label->setVar("content", $labelTB->toString());
+						}
 						else{
-							if($c["nome"]=="dataTermino")
+							$label = new HtmlTag("td", "", "c");
+							$label->setVar("content", "<b>".$c["label"]."</b>");
+						}
+						//fim 003.5
+						$$tabela .= '
+						<tr class="c">'.$label->toString().'
+							<td class="c" id="'.$c['nome'].'_value_tr">';
+						if(isset($c['extra']) && strpos($c['extra'], 'moeda') !== false){
+							//solicitacao 003 realiza a soma total
+							if($c["nome"]=="valorTotal")
+								$$tabela .= $sumAd;
+							else 
+								$$tabela .= 'R$ <span id="'.$c['nome'].'_val">'.number_format($c['valor'], 2, ',', '.').'</span>';
+							//fim 003
+						}
+						else{
+							//solicitacao 003
+							if($c["nome"]=="dataTermino"){
 								$unity="";
-							$$tabela .= '<span id="'.$c['nome'].'_val">'.$c['valor'].' '.$unity.'</span>';
+								$$tabela .= $sumAd;
+							}
+							else 
+								$$tabela .= '<span id="'.$c['nome'].'_val">'.$c['valor'].' '.$unity.'</span>';
+							//fim 003
 						}
 						//solicitacao 003
-						$$tabela .= $sumAd;
+// 						$$tabela .= $sumAd;
 						//fim 003
 					}
 					
@@ -1163,10 +1209,6 @@ class Contrato extends Documento {
 					$adByName = $ad->getAditivos();//aditivos pelo nome
 					$valorTotal = doubleval($c["valor"]);//valor total do campo
 					$adCount = count($adByName);//total de aditivos para essa campo
-					//para adicionar somente se nao ha aditivos a esse campo
-					if (checkPermission(88) && $c['valor'] && $adCount==0) {
-						$aditivo_div .= ' <a id="'.$c['nome'].'_aditivar_link" href="javascript:void(0)" onclick="javascript:show_aditivar_campo(\''.$c['nome'].'\')">[Aditivar]</a> ';
-					}
 					//inicializa variaveis para calcular total dos aditivos
 					$total_aditivos = 0;
 					//abre tag onde os aditivos serao mostrados
@@ -1234,28 +1276,31 @@ class Contrato extends Documento {
 							$htmlTable->appendLine(array("Valor","R$ ".$valorAditivo));
 							$htmlTable->appendLine(array("Porcentagem",$porcentagem."%"));
 							$htmlTable->appendLine(array("Motivo",$a["motivo"]));
-							$content = "(+) R$ ".number_format($valorTotal, 2, ',', '.')."(".$porcentagem."%)";
+							$content = "(+) R$ ".$valorAditivo."(".$porcentagem."%)";
 						}
 						else{
+							$valorTotal += intval($a['valor']);
 							$valorAditivo = intval($a["valor"]);
 							$htmlTable->appendLine(array("Dias",$valorAditivo));
 							$htmlTable->appendLine(array("Porcentagem",$porcentagem."%"));
 							$htmlTable->appendLine(array("Motivo",$a["motivo"]));
-							$content = "(+) ".$valorAditivo.' '.($valorAditivo>1?'dias':'dia')."(".$porcentagem."%)";
-						}
-						if($a["id"]==$lastAdId){
-							$href="javascript:void(0)";
-							$onclick='javascript:show_aditivar_campo("'.$c['nome'].'")';
-							$aditivarDAO = new HtmlTag("a", "", "","[Aditivar]",null,new HtmlTagAttr(array("href","onclick"),array($href,$onclick)));
-							$href="javascript:void(0)";
-							$htmlTag->setNext($aditivarDAO);
+							$content = "(+) ".$valorAditivo.' '.($valorTotal>1?'dias':'dia')."(".$porcentagem."%)";
 						}
 						$href="javascript:void(0)";
 						$onclick='javascript:show_editar_aditivo("'.$a['id'].'","'.$c['nome'].'")';
 						$divDAO->setChildren(new HtmlTag("a", "", "","[Editar]",null,new HtmlTagAttr(array("href","onclick"),array($href,$onclick))));
 						$htmlTable->setColumnStyle(new HtmlTagStyle(array("font-weight"),array("bold")),-1,0);
 						$htmlTag->setVar("content", $content);
-						$aditivo_div .= "".$div->toString();	
+						if($a["id"]==$lastAdId)
+							$div->setStyle("margin-bottom", "5px");
+						$aditivo_div .= "".$div->toString();
+						if($a["id"]==$lastAdId){
+							if(strpos($c['extra'], 'moeda') !== false)
+								$aditivo_div .= "<hr><b>Total: R$ ".number_format($valorTotal, 2, ',', '.')."</b>";
+							else{
+								$aditivo_div .= "<hr><b>Dias aditivados: ".$valorTotal.' '.($valorTotal>1?'dias':'dia')."</b>";
+							}
+						}
 					}
 					$aditivos->append($ad);
 					$aditivo_div .= '</div>';
@@ -1273,14 +1318,12 @@ class Contrato extends Documento {
 					}
 					$aditivo = true;
 				}
-				
 				// verifica se o usuário tem permissão para editar o campo
 				if ($c['editarAcao'] < 0 || ($c['editarAcao'] > 0 && !checkPermission($c['editarAcao'])) || !$doc->verificaEditavel($c['nome'])) {
 					$$tabela .= $aditivo_div;
 					$$tabela .= '</td></tr>';
 					continue;
 				}
-				
 				// caso tenha, monta formulário de edição
 				$$tabela .= '<form accept-charset="'.$conf['charset'].'" id="'.$c['nome'].'_form" action="javascript: editContrVal(\''.$c['nome'].'\')" method="post" style="display: inline">
 				<span id="'.$c['nome'].'_edit" style="display:none;">
@@ -1290,7 +1333,6 @@ class Contrato extends Documento {
 				</form>';
 				$$tabela .= $aditivo_div;
 				$$tabela .= '</td></tr>';
-				
 			}//if
 		}//foreach
 		$tabelaEsq .= '</table>';
@@ -1328,32 +1370,6 @@ class Contrato extends Documento {
 		
 		if ($this->verificaEditavel(''))
 			$html .= $this->showEditObrasRec();
-			
-		
-// 		$dialogHtml = new HtmlTag("div", "dialog_aditivo", "");
-// 		foreach ($aditivos as $a){
-// 			$child = new HtmlTag("div", "dialog_aditivo_".$ad->getVar("label"), "");
-// 			$child->setStyle("display", "none");
-// 			$valores = $a->getVar("valor");
-// 			$motivos = $a->getVar("motivo");
-// 			echo "<PRE>";
-// 			print_r($valores);
-// 			echo "</PRE>";
-// 			die('s');
-// 			foreach($valores as $av){
-				
-// 			}
-// 			$ctable = new HtmlTag("table", "", "");
-			
-// 			$dialogHtml->setVar("children", )
-// 			$valores=$a->getVar("valor");
-// 			$motivos=$a->getVar("motivo");
-// 			if(count($valores)>0){
-// 				foreach ($valores as $k=>$v){
-				
-// 				}
-// 			}
-// 		}
 		//retorna o cod html da tabela
 		return $html;
 	}

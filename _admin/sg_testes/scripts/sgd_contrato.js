@@ -383,7 +383,6 @@ function saveContrVal(campoNome){
 	$.post('sgd.php?acao=edit&docID='+$("#docID").html()+'&campo='+campoNome,{
 		newVal : valor
 	},function(d){
-		//var fb = eval(d);
 		try {
 			fb = eval(d);
 		} catch(e) {
@@ -391,38 +390,7 @@ function saveContrVal(campoNome){
 				alert("Erro encontrado. Contacte seu administrador e mostre essa mensagem: " + e.message);
 			}
 		}
-		
-		if(fb[0].success == 'true'){
-			var href = 'javascript:editContrVal(\''+campoNome+'\')';
-			var msg = 'Salvo!';
-			if (campoNome == 'valorMaoObra' || campoNome == 'valorProj' || campoNome == 'valorMaterial')
-				$("#"+campoNome+"_val").html(unescape(valor).replace(".",","));
-			else
-				$("#"+campoNome+"_val").html(unescape(valor));
-			$("#"+campoNome+"_edit").hide();
-			$("#"+campoNome+"_val").show();
-			
-			if (fb[0].extra != undefined && fb[0].extra != null) {
-				if (fb[0].extra == 'reload') {
-					window.location.reload();
-				}
-				else {
-					$("#"+fb[0].extra+"_val").html(unescape(fb[0].extraVal));
-				}
-			}
-			
-			if (campoNome == 'valorMaoObra' || campoNome == 'valorProj' || campoNome == 'valorMaterial'){
-				window.location.reload();
-			}
-			
-		} else {
-			var href = 'javascript:saveContrVal(\''+campoNome+'\')';
-			var msg = 'Erro. Tentar Novamente.';
-		}
-		
-		$("#"+campoNome+"_link").val(msg);
-		//$("#"+campoNome+"_form").action("href",href);
-		$("#"+campoNome+"_form").attr("action", href);
+		window.location.reload();//apenas reload na pagina
 	});
 	
 }
@@ -486,8 +454,6 @@ function showEditRecurso(procID) {
 					var item = new Object;
 					item.id = $(this).val();
 					item.valor = $("#valRec_"+$(this).val(), $("#divEditRec")).val();
-					//alert(item.id)
-					//alert(item.valor)
 					recursos.push(item);
 				});
 				
@@ -540,12 +506,20 @@ function show_aditivar_campo(nome_campo){
 		$("#aditivar_desc_moeda").css("display","block");
 		$("#aditivar_input_moeda").css("display","block");
 	}
+	else if(nome_campo=="valorProj"){
+		$("#aditivar_input_moeda input").mascara("moeda");
+		$("#aditivar_desc_moeda").css("display","block");
+		$("#aditivar_input_moeda").css("display","block");
+	}
 	else {//if(nome_campo=="prazoProjObra"){
 		$("#aditivar_desc_dia").css("display","block");
 		$("#aditivar_input_dia").css("display","block");
 	}
 	//querem q apenas o campo outros apareca
 	$("#aditivar_razao_outro").show();
+	//003.5
+	$("#aditivar_razao_outro").attr("value","outro");
+	//fim 003.5
 	$("#aditivar_razao").hide();
 	
 	//fim 003

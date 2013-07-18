@@ -40,6 +40,7 @@ Version: 1.3
 
 /**
  * Jquery para as Máscaras.
+ * Recebe o tipo da mascara q a aplica no elemento
  */
 $.fn.mascara = function(t){
 	if($(this).attr('mask'))

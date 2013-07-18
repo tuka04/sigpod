@@ -134,6 +134,11 @@ class html{
 		$this->charset = $defaults['charset'];
 	}
 	
+	public function setVar($var,$val){
+		if(isset($this->$var))
+			$this->$var = $val;
+	}
+	
 	/**
 	 * @desc troca o template da pagina
 	 * @param string $templateFile
@@ -160,12 +165,11 @@ class html{
 		$this->html = str_replace('{$randNum}', 	$this->jsversion,	$this->html);
 		$this->html = str_replace('{$charset}', 	$this->charset, 	$this->html);
 		
+		
 		for ($i = 1; $i <= count($this->content); $i++) {
 			$this->content[$i] = str_replace('{$randNum}', $this->jsversion, $this->content[$i]);
 			$this->html = str_replace('{$content'.$i.'}', $this->content[$i], $this->html);
-			
 		}
-		
 		if ($this->campos != null){
 			foreach ($this->campos as $key => $campo) {
 				$this->html = str_replace('{$campos_'.$key.'}', $campo, $this->html);
