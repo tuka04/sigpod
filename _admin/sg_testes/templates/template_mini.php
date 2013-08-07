@@ -11,6 +11,8 @@
 		<link rel="stylesheet" type="text/css" href="css/layout_mini.css" />
 		<script type="text/javascript" src="scripts/jquery.js?r={$randNum}"> </script>
 		<script type="text/javascript" src="scripts/commom.js?r={$randNum}"> </script>
+		<script type="text/javascript" src="scripts/jquery-ui-1.8.18.custom.min.js?r={$randNum}"></script>
+  <link rel="stylesheet" type="text/css" href="css/smoothness/jquery-ui-1.8.18.custom.css" />
 		{$head}
 		<title>{$title}</title>
 	</head>

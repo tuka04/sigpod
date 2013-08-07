@@ -19,5 +19,14 @@ interface DAOIF {
 	 * Cria a tabela
 	 */
 	public function create();
+	
+	/**
+	 * Seta uma variavel, que existe, desse objeto
+	 * @param string $var
+	 * @param string $val
+	 * @return boolean
+	 */
+	public function setVar($var,$val);
+	
 } 
 ?>

@@ -976,6 +976,15 @@ class Contrato extends Documento {
 		
 		// senao, comeca a montar as tabelas
 		$tabelaEsq .= '<table border="0" width="100%"><tr><td width="30%"></td><td width="70%"></td></tr>';
+		//solicitacao 005: insercao do estado do contrato
+		requireSubModule(array("frontend","contrato_estado"));
+		$ce = new ContratoEstado($this->id);
+		$link = new HtmlTag("a", "","","[Editar]");
+		$link->setAttr(array("href","onclick"),array("#","javascript:contratoEstadoDialogOpen(\"".ContratoEstado::DialogInsereID."\",\"".$doc->id."\");"));
+		$link->setNext($ce->getAddDialog());
+		$tabelaEsq .= '<tr class="c"><td class="c"><b>Estado do Contrato:</b> </td><td class="c"><span id="estado">'.$ce->getEstadoHtml()." ".$link->toString().'</span></td></tr>';
+		
+		//fim 005
 		$tabelaEsq .= '<tr class="c"><td class="c"><b>N&uacute;mero do Doc (CPO):</b> </td><td class="c"><span id="docID">'.$doc->id.'</span></td></tr>';
 		
 		$tabelaDir .= '<table border="0" width="100%"><tr><td width="30%"></td><td width="70%"></td></tr>';

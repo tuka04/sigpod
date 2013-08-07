@@ -5,12 +5,45 @@
 	include_once('classes/PHPExcel.php');
 	
 	includeModule('sgo');
-	requireSubModule(array("alerta","aditivo"));
-	global $conf;
-	include_once('conf.inc.php');
-	$a = new Alerta();
-	echo $a->getTable()->toString();
+	require_once 'classes/documento/tipo/DocumentoTipo.class.php';
 	
+// 	$b = new Busca("busca");
+// 	$b->run();
+	die("asd");
+	
+	
+	requireSubModule(array("frontend","contrato_estado"));
+	
+	global $conf,$bd;
+	
+	include_once('conf.inc.php');
+	if(!is_object($bd)){
+		$bd = new BD();
+	}
+	$ce = new ContratoEstado();
+	$_GET['tipoDoc']="contr,";
+	foreach (explode(',',$_GET['tipoDoc']) as $tipo) {
+		$tp = getDocTipo($tipo);
+		if(count($tp)){
+			$tiposDoc[] = array('id' => $tp[0]['id'], 'nomeAbrv' => $tipo, 'tab' => $tp[0]['tabBD']);
+		}
+	}
+	
+	
+// 	$ce->getAllContratos();
+	$_GET['valoresBusca']="numProcContr=|numProcContr_operador=undefined|numeroContr=|numeroContr_operador=undefined|anoE=|anoE_operador=undefined|unOrg=|unOrg_operador=undefined|valorProj=|valorProj_operador=eq|valorMaoObra=|valorMaoObra_operador=eq|valorMaterial=|valorMaterial_operador=eq|valorTotal=|valorTotal_operador=eq|dataAssinatura=|dataAssinatura_operador=undefined|dataReuniao=|dataReuniao_operador=undefined|prazoContr=|prazoContr_operador=undefined|vigenciaContr=|vigenciaContr_operador=undefined|inicioProjObra=|inicioProjObra_operador=undefined|prazoProjObra=|prazoProjObra_operador=undefined|dataTermino=|dataTermino_operador=undefined|recursosOrc=|recursosOrc_operador=undefined|elemEconomico=|elemEconomico_operador=undefined|responsavelID=0|responsavelID_operador=undefined|empresaID=|empresaID_operador=undefined|";
+	$campos = explode("|", $_GET['valoresBusca']);
+	//campos
+	foreach ($campos as $c) {
+		if($c != '') {
+			$dados = explode("=", $c);
+			$valoresBusca[$dados[0]] = $dados[1];
+		}
+	}
+	$res = searchDoc("","",array(), $tiposDoc, $valoresBusca, array(), "", -1, 0,0,10000);
+	echo "<PRE>";
+	print_r($res);
+	echo "</PRE>";
 	//phpinfo();exit();
 	//$bd = new BD($conf["DBLogin"], $conf["DBPassword"], $conf["DBhost"], $conf["DBTable"]);
 	//phpinfo(); exit();

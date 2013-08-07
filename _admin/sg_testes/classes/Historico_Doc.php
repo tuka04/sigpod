@@ -362,6 +362,9 @@ class Historico_Doc extends historico {
 		elseif ($this->get('tipo') == 'rmAlerta'){//solicitacao 004
 			$acao = 'Removeu o alerta desse contrato.';
 		}
+		elseif ($this->get('tipo') == 'editEstado'){//solicitacao 005
+			$acao = 'Editou o estado desse contrato.';
+		}
 		else {
 			$acao = $this->get('acao');
 		}
@@ -398,7 +401,8 @@ class Historico_Doc extends historico {
 		 */
 		//solicitacao 004
 		$array['rmAlerta'] = 'Removeu o alerta desse contrato.';
-		
+		//solicitacao 005
+		$array['editEstado'] = 'Editou o estado desse contrato.';
 		return $array;
 	}
 	

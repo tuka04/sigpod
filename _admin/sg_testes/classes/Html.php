@@ -168,23 +168,23 @@ class html{
 		
 		for ($i = 1; $i <= count($this->content); $i++) {
 			$this->content[$i] = str_replace('{$randNum}', $this->jsversion, $this->content[$i]);
-			$this->html = str_replace('{$content'.$i.'}', $this->content[$i], $this->html);
+			$this->html = str_replace('{$content'.$i.'}',$this->content[$i], $this->html);
+			$nextContent = $i+1;
 		}
+		//replace dos restantes dos contents q ainda persistem em aparecer
+		
+		
 		if ($this->campos != null){
 			foreach ($this->campos as $key => $campo) {
 				$this->html = str_replace('{$campos_'.$key.'}', $campo, $this->html);
 			}
 		}
-		
-		/*$arqTemp = fopen("dump.html", "w");
-		fwrite($arqTemp, $this->html);
-		fclose($arqTemp);*/
-		
+		while(stripos($this->html,'{$content'.$nextContent.'}')!==false){
+			$this->html = str_replace('{$content'.$nextContent.'}', JS::generateJSTagHtml(JS::getHideElem("#c".$nextContent)), $this->html);
+			$nextContent++;
+				
+		}
 		print($this->html);
-		
-		/*$arqTemp = fopen("dump2.html", "w");
-		fwrite($arqTemp, $this->html);
-		fclose($arqTemp);*/
 	}
  		
 }

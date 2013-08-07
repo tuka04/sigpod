@@ -192,7 +192,7 @@
 				exit();
 				
 			} elseif ($_GET['acao'] == 'edit') {
-				if(!isset($_GET['docID']) || !isset($_GET['campo']) || !isset($_POST['newVal'])) {
+				if(!isset($_GET['docID']) || !isset($_GET['campo']) || !isset($_POST['newVal'])) {					
 					print json_encode(array(array('success' => 'false'))); exit(); 
 				}
 				$res = editDoc($_GET['docID'], $_GET['campo'],SGEncode(urldecode($_POST['newVal']),ENT_QUOTES, null, false));

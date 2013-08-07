@@ -18,8 +18,10 @@ function doBusca(inicio, numResultados){
 	$("#resBusca").show();
 	$(".buscaFormTable").slideUp();
 	$(".novaBuscaBtn").show();
-	
-	var camposNomes = $("#camposNomes").val().split(',');
+	if($("#camposNomes").val())
+		var camposNomes = $("#camposNomes").val().split(',');
+	else
+		var camposNomes = new Array();
 	var valoresBusca = '';
 	var tipoDoc = '';
 	var checkedBoxes = $(".tipoDoc:checked");
@@ -80,7 +82,6 @@ function doBusca(inicio, numResultados){
 		
 		
 	});
-	
 	$.get('sgd_busca.php',{
 			tipoDoc:       tipoDoc,
 			tipoBusca:     "busca", 

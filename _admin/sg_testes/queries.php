@@ -68,7 +68,6 @@
 	 */
 	function getDocTipo($tipo_doc){
 		global $bd;
-		
 		return $bd->query("SELECT * FROM label_doc WHERE nomeAbrv = '$tipo_doc'");
 	}
 	
@@ -277,7 +276,7 @@
 		if ($buscaOwner != '0') {
 			$restr[] = "(d.ownerID = '" .$_SESSION['id']. "' OR (d.ownerID = '-1' AND ".removeAcentosSQL('d.OwnerArea')." = '".$_SESSION['area']."'))";
 		}
-		
+
 		if(count($tipos) > 1) {
 			if ($histBuscaSQL || (count($tipos) == 1 && $tipos[0]['id'] == 5 && $docNum))
 				$sql = "SELECT d.id FROM doc AS d RIGHT JOIN data_historico AS h ON d.id = h.docID WHERE ";
@@ -289,9 +288,7 @@
 			if ($histBuscaSQL || (count($tipos) == 1 && $tipos[0]['id'] == 5 && $docNum))
 				$sql = "SELECT d.id FROM doc AS d INNER JOIN $tab AS t ON t.id = d.tipoID RIGHT JOIN data_historico AS h ON d.id = h.docID WHERE ";
 			else
-				$sql = "SELECT d.id FROM doc AS d INNER JOIN $tab AS t ON t.id = d.tipoID WHERE ";
-				
-				
+				$sql = "SELECT d.* FROM doc AS d INNER JOIN $tab AS t ON t.id = d.tipoID WHERE ";	
 			foreach ($restrTipos as $cName => $cValue) {
 				
 				if (stripos($cName, "_operador") !== false) {
@@ -357,10 +354,7 @@
                 } elseif($valor['valor']) { //montagem da condicao
 					$restr[] = " t.".$cName." LIKE '%".$cValue."%' ";
 				}
-				
-				/*if (stripos($valor['extra'], "moeda") !== false) {
-					var_dump($valor);
-				}*/
+
 			}
 			/*foreach($restrTipos as $cName => $cValue) {
 				if ($cName == 'guardachuva' && $cValue != "") {
@@ -380,7 +374,6 @@
 		if (count($tipos) == 1 && $tipos[0]['id'] == 5 && $docNum) {
 			$sql .= " OR (h.label LIKE '%Recebido%' AND h.despacho LIKE '%via Rel. Remessa n&deg;$docNum%')"; 
 		}
-		
 		//adicionando condicoes de historico
 		if ($histBuscaSQL){
 			$sql_desp = '';
@@ -432,6 +425,7 @@
 		
 		// executa a query
 		$res = $bd->query($sql);
+
 		$qtde = count($res); // conta resultados
 		
 		// faz a paginacao cortando a array, comecando em $buscaIni e exibindo $numResultados resultados

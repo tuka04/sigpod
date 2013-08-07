@@ -229,24 +229,39 @@ table.gerenAlertasUsers tr td {
 	text-align:center;
 }
 
-#tableAlerta th {
+.tabelaGenerica th, #tableSysContratoEstado th , #tableAlerta th {
 	width:70px;
 }
 
-#tableAlerta th:first-child {
+.tabelaGenerica th:first-child, #tableSysContratoEstado th:first-child, #tableAlerta th:first-child {
 	width:20px;
 }
 
-#tableAlerta {
+#tableSysContratoEstado, #tableAlerta {
 	padding:2px;
 	text-align:center;
 }
-#tableAlerta tr:nth-child(odd) {
+.tabelaGenerica{
+	padding:2px;	
+}
+.tabelaGenerica tr:nth-child(odd), #tableSysContratoEstado tr:nth-child(odd) , #tableAlerta tr:nth-child(odd) {
 	background-color:rgb(236,236,236);
 }
-#tableAlerta tr:nth-child(even) {
+.tabelaGenerica tr:nth-child(even), #tableSysContratoEstado tr:nth-child(even), #tableAlerta tr:nth-child(even) {
 	background-color:rgb(194,194,194);
 }
-#tableAlerta thead th {
+.tabelaGenerica thead th, #tableSysContratoEstado thead th , #tableAlerta thead th {
 	background-color:rgb(194,194,194);
+}
+.classSysContratoEstado{
+	padding: 5px 0 5px 5px;
+	text-align: right;	
+}
+.classSysContratoEstadoCheck{
+	padding: 4px 0 0px 1px;
+	text-align: left;
+}
+
+.noBackground {
+	background-color:#FFFFFF;
 }

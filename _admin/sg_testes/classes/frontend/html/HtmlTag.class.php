@@ -41,8 +41,12 @@ class HtmlTag implements HtmlTagIF {
 	 * @var HtmlTag
 	 */
 	private $children;
-	
-	public function HtmlTag($type,$id,$class,$content="",$style="",$attr=""){
+	/**
+	 * atributos extras q vao direto para dentro da tag
+	 * @var string
+	 */
+	private $extra;
+	public function HtmlTag($type,$id,$class="",$content="",$style="",$attr="",$extra=""){
 		$this->load();
 		$this->type=$type;
 		$this->id=$id;
@@ -50,6 +54,7 @@ class HtmlTag implements HtmlTagIF {
 		$this->content=$content;
 		$this->next=null;
 		$this->children=null;
+		$this->extra="";
 		if(is_object($style) && ($style instanceof HtmlTagStyle))
 			$this->style=$style;
 		else
@@ -67,13 +72,20 @@ class HtmlTag implements HtmlTagIF {
 	}
 	
 	public function toString(){
+		if(empty($this->type))
+			return "";
 		$id = (empty($this->id))?"":" id='".$this->id."' ";
 		$class = (empty($this->class))?"":" class='".$this->class."' ";
-		$str = "<".$this->type." ".$id.$class." ".$this->attr->toString()." ".$this->style->toString()." >";
+		$str = "<".$this->type." ".$id.$class." ".$this->attr->toString()." ".$this->style->toString()." ".$this->extra." >";
 		if(is_object($this->children))
 			$str .= $this->children->toString();
-		if(is_object($this->next))
-			$str .= $this->content.$this->getEndTag().$this->next->toString();
+		if(is_object($this->next)&&$this->next!=null){
+			if(is_object($this->content) && ($this->content instanceof HtmlTag)){
+				$str .= $this->content->toString().$this->next->toString();
+			}
+			else 
+				$str .= $this->content.$this->getEndTag().$this->next->toString();
+		}
 		else 
 			$str .= $this->content.$this->getEndTag();
 		return $str;

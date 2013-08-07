@@ -25,16 +25,27 @@ class HtmlTable extends HtmlTag{
 	 * @var boolean
 	 */
 	private $checkbox = false;
+	/**
+	 * Head caption
+	 * @var HtmlTag
+	 */
+	private $caption;
 	
 	public function HtmlTable($id,$class,$num_cols){
 		parent::HtmlTag("table", $id, $class);
 		$this->head=new HtmlTag("thead", "", "");
 		$this->body=new HtmlTag("tbody", "", "");
-		$this->num_cols=$num_cols;		
+		$this->caption=new HtmlTag("caption", "");
+		$this->num_cols=$num_cols;
+		$this->setChildren($this->caption);
 		$this->setChildren($this->head);
 		$this->setChildren($this->body);
+		
 	}
 	
+	public function setCaption($c){
+		$this->caption->setVar("content", $c);
+	}
 	public function enableCheckbox(){
 		$this->checkbox = true;	
 	}	
@@ -65,7 +76,7 @@ class HtmlTable extends HtmlTag{
 	 * @param string $class
 	 * @param HtmlTag $hidden 
 	 */
-	public function appendLine($val,$class="",HtmlTag $hidden=null){
+	public function appendLine($val,$class="",HtmlTag $hidden=null,HtmlTagStyle $style=null){
 		if(count($val)!=$this->num_cols)//erro
 			die("Numero de colunas nao bate com o numero de valores");
 		if(!is_array($val)){
@@ -82,10 +93,17 @@ class HtmlTable extends HtmlTag{
 			$check = new HtmlTag("input", "chk_".$this->num_lines, "");
 			$check->setAttr(array("type"), array("checkbox"));
 			$check->setChildren($hidden);
-			$tr->setChildren(new HtmlTag("td", "", "",$check->toString()));
+			$tr->setChildren(new HtmlTag("td", "", $class,$check->toString(),$style));
 		}
-		foreach ($val as $v)
-			$tr->setChildren(new HtmlTag("td", "", "",$v));
+		foreach ($val as $k=>$v){
+			if(is_array($class) && count($val)==count($class)){
+				$tr->setChildren(new HtmlTag("td", "", $class[$k],$v,$style));
+			}
+			else{
+				$tr->setChildren(new HtmlTag("td", "", $class,$v,$style));
+			}
+			
+		}
 		$this->num_lines++;
 	}
 	/**
@@ -155,12 +173,42 @@ class HtmlTable extends HtmlTag{
 			if($i!=-1){
 				if($c==$i){
 					$tr->setStyle(array_keys($st),array_values($st));
+					$tr=null;
+				}
+				else{
+					$c++;
 					$tr=$tr->getVar("next");
 				}
-				$c++;
 			}
 			else{
 				$tr->setStyle(array_keys($st),array_values($st));
+				$tr=$tr->getVar("next");
+			}
+		}
+	}
+	/**
+	 * seta o estilo de uma linha
+	 * Se deixado -1 o estilo vai para todas as linhas
+	 * @param int $i
+	 * @param HtmlTagStyle $style
+	 */
+	public function setLineAttr(HtmlTagAttr $attr,$i=-1){
+		$tr = $this->body->getVar("children");
+		$st = $attr->toArray();
+		$c=0;
+		while($tr!=null){
+			if($i!=-1){
+				if($c==$i){
+					$tr->setAttr(array_keys($st),array_values($st));
+					$tr=null;
+				}
+				else{
+					$c++;
+					$tr=$tr->getVar("next");
+				}
+			}
+			else{
+				$tr->setAttr(array_keys($st),array_values($st));
 				$tr=$tr->getVar("next");
 			}
 		}

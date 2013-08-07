@@ -306,7 +306,6 @@ function removeSysAlerta(tr,id){
 		$("#rmAlertaSysAlerta").html("Deseja remover o alerta de código: "+aid.toString()+"</div>");
 	}
 	$el.dialog({
-		type:"POST",
 		resizable: false,
 		height:140,
 		modal: true,
@@ -332,6 +331,202 @@ function removeSysAlerta(tr,id){
 				$( this ).dialog( "close" );
 			}
 		}
-	})
-	
+	});
 }
+//fim 004
+//solicitacao 005
+function gerenciarContratoEstado(){
+	//construcao da tabela de gerencia
+	$.ajax({
+		  type:"POST",
+		  url: "contrato_estados.php",
+		  data:{getSysContratoEstado:true},
+		  cache: false,
+		  dataType: "json",
+		  success: function(data){
+			  var $el = $("#"+data.dialogID);
+			  var $tb = $("#"+data.tabelaID);
+			  $tb.remove();
+			  $el.append(data.tabela);
+			  $el.dialog({
+				 title:"Administração de estado contratual",
+				 modal:true,
+				 autoOpen:true,
+				 width:450,
+				 height:300,
+			  });
+			  $tb.tablesorter({ 
+					headers: { 0:{sorter:false}} 
+				}); 
+			  $('#'+data.tabelaID+' input[type="checkbox"]').enableCheckboxRangeSelection();
+		  }
+	});
+}
+function gerenciarEstadoOpenAdd(el,tid){
+	$link = $("#"+el.id);
+	var $el = $('#'+tid);
+	$el.show("slide",{direction:"left"},500);
+	$link.hide();
+	$("#daoDeletarContratoEstado").hide();
+	$("#tableSysContratoEstado").hide();
+}
+function gerenciarContratoEstadoClearValue(nid,tid){
+	var $el = $('#'+tid);
+	var $eln = $('#'+nid);
+	$("#respServerSysContratoEstado").css("display","none");
+	//limpa campos
+	$el.children('tbody').each(function(){
+		$(this).children('tr').each(function(){
+			$(this).children('td').each(function(){
+				$(this).children('input').each(function(){
+					if($(this).is('input[type="checkbox"]'))
+						this.checked = false;
+					else
+						$(this).attr("value","");
+				});
+			});
+		})
+	});
+	$el.hide()
+	$eln.show("slide",{direction:"left"},500);
+	$("#daoDeletarContratoEstado").show("slide",{direction:"left"},500);
+	$("#tableSysContratoEstado").show("slide",{direction:"left"},500);
+}
+function gerenciarContratoEstadoSave(tb){
+	var $el = $("#"+tb);
+	var nome="",motivo=0,dias=0,data=0;
+	var error=false;
+	var msgErro="";
+	$("#"+tb+" input").each(function(){
+		if($(this).is('input[type="checkbox"]')){
+			var name = $(this).attr("name").split(".");
+			if(name[name.length-1] == "motivo")
+				motivo=(this.checked)?1:0;
+			else if(name[name.length-1] == "data")
+				data=(this.checked)?1:0;
+		}
+		else if($(this).attr("obr") && $(this).attr("value")==""){
+			msgError="Campos com * são obrigatórios.";
+			error=true;
+			return;
+		}
+		else{
+			var name = $(this).attr("name").split(".");
+			if(name[name.length-1] == "nome")
+				nome = $(this).attr("value");
+			else if(name[name.length-1] == "dias"){
+				dias = $(this).attr("value")==""?0:$(this).attr("value");
+				var exp = /^-?\d\d*$/;
+				if(!exp.test(dias)){
+					msgError="Por favor, em Dias, utilize apenas números maiores que zero e inteiro. Exemplo: 10 ou 36";
+					error = true;
+					return;
+				}
+			}
+		}
+	});
+	if(error){
+		displayMsgError("respServerSysContratoEstado",msgError);
+		return;
+	}
+	$.ajax({
+		  type:"POST",
+		  url: "contrato_estados.php",
+		  data:{saveSysContratoEstado:true,nome:nome,dias:dias,motivo:motivo,data:data},
+		  cache: false,
+		  dataType: "json",
+		  success: function(data){
+			  if(data.success=='true'||data.success==true){
+				  var num_lin = $("#"+data.tabela+" tbody").children().length;//num de linhas
+				  var tr = '<tr id="'+data.tabela+'_'+num_lin+'">';
+				  var l1='<td><input type="checkbox" id="chk_'+num_lin+'"/>'//linha 1 checkbox
+				  		 +'<input type="hidden" name="eid" value="'+data.id+'"/>'
+				  		 +'<input type="hidden" name="lid" value="'+data.tabela+'_'+num_lin+'"/>';
+				  var l2='<td>'+data.id+'</td>';
+				  var l3='<td>'+nome+'</td>';
+				  var l4='<td>'+(motivo?"Sim":"Não")+'</td>';
+				  var l5='<td>'+(dias?dias:0)+'</td>';
+				  var l6='<td>'+(data?"Sim":"Não")+'</td>';
+				  $("#"+data.tabela+" tbody").append(tr+l1+l2+l3+l4+l5+l6+"</tr>");
+				  gerenciarContratoEstadoClearValue("linkNovoContratoEstado",tb);
+				  displayMsgNotice("respServerSysContratoEstado",data.msg);
+			  }
+			  else{
+				  displayMsgError("respServerSysContratoEstado",data.msg);
+			  }
+		  }
+	});
+}
+function removeSysContratoEstado(tbID){
+	var eid = new Array();
+	var lid = new Array();
+	$("#"+tbID+" input[type=checkbox]").each(function(){
+		if(this.checked){
+			eid.push($(this).parent().children('input[type="hidden"][name="eid"]').attr('value'));
+			lid.push($(this).parent().children('input[type="hidden"][name="lid"]').attr('value'));
+		}
+	});
+	if(eid.length==0){
+		alert("Por favor, selecione pelo menos um estado.");
+		return;
+	}
+	$el = $("#rmSysContratoEstado");
+	if(!$el.attr('id')){
+		var html = "<div id='rmSysContratoEstado'>Deseja remover o alerta de código: "+eid.toString()+"</div>";
+		$('body').append(html);
+		$el = $("#rmSysContratoEstado");
+	}
+	else{
+		$("#rmSysContratoEstado").html("Deseja remover o(s) estado(s) de código: "+eid.toString()+"</div>");
+	}
+	$el.dialog({
+		type:"POST",
+		resizable: false,
+		height:140,
+		modal: true,
+		autoOpen:true,
+		buttons: {
+			"Sim": function() {
+				$.ajax({
+					  url: "contrato_estados.php",
+					  data:{removeSysContratoEstado:true,id:eid.toString()},
+					  cache: false,
+					  dataType: "json",
+					  success: function(data){
+						  if(data.success=='true'||data.success==true){
+							  for(var i in lid)
+								  $("#"+lid[i]).remove();
+							  displayMsgNotice("respServerSysContratoEstado",data.msg);
+						  }
+						  else{
+							  displayMsgError("respServerSysContratoEstado",data.msg);
+						  }
+						  
+					  }
+				});
+				$( this ).dialog( "close" );
+			},
+			"Não": function() {
+				$( this ).dialog( "close" );
+			}
+		}
+	});
+}
+function displayMsgError(divID,msg){
+	var classes = "ui-state-error";
+	var $el = $("#"+divID);
+	$el.removeClass("ui-state-highlight");
+	$el.addClass(classes);
+	var $el = $("#"+divID);
+	$el.show("pulsate",{},250);
+	$el.html(msg);
+}
+function displayMsgNotice(divID,msg){
+	var classes = "ui-state-highlight";
+	var $el = $("#"+divID);
+	$el.removeClass("ui-state-error");
+	$el.addClass(classes);
+	$el.show("pulsate",{},250);
+	$el.html(msg);
+}
+//fim 005

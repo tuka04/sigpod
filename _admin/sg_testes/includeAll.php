@@ -6,6 +6,17 @@
 	include_once('sgd_interface.php');
 	include_once('sgd_modules.php');
 	include_once('queries.php');
+	
+	/**
+	 * require de arquivos comuns
+	 */
+	require_once 'classes/common/ArrayObj.class.php';
+	require_once "classes/common/GenericObj.class.php";
+	require_once 'classes/common/DataObj.class.php';
+	require_once 'classes/common/HtmlString.class.php';
+	require_once 'classes/common/CommonMethods.class.php';
+	require_once 'classes/common/JS.class.php';
+	
 	/* include de classes */
 	include_once('classes/Html.php');
 	include_once('classes/Pessoa.php');
@@ -17,6 +28,7 @@
 	include_once('classes/Historico.php');
 	include_once('classes/HistFactory.php');
 	include_once('classes/Historico_Doc.php');
+	
 	
 	//if(isset($_GET['-s'])) exit();
 	
@@ -117,6 +129,10 @@
 				require_once 'classes/contrato/alerta/Alerta.class.php';
 				require_once 'classes/contrato/alerta/Vencimento.class.php';
 				require_once 'classes/usuario/alerta/UsuarioAlerta.class.php';
+			}
+			else if($n=='contrato_estado'){
+				require_once 'classes/system/contrato/estado/SysContratoEstado.class.php';
+				require_once 'classes/contrato/estado/ContratoEstado.class.php';
 			}
 		}
 	}

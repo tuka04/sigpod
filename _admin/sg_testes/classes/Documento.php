@@ -143,7 +143,7 @@ class Documento {
 	function __construct($id){
 		global $bd;
 		if(!is_object($bd)){
-			//solicitacao 004: dava bub pois a global era NULL, entao nesse caso reconstruimos o obj
+			//solicitacao 004: dava bug pois a global era NULL, entao nesse caso reconstruimos o obj
 			$bd = new BD();
 		}
 		$this->bd = $bd;	

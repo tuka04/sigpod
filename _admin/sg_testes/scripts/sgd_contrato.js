@@ -743,3 +743,104 @@ function somadias(data, dias) {
 
    return diafuturo+"/"+mes+"/"+ano;
 }
+//solicitacao 005
+function contratoEstadoDialogOpen(did,doc){
+	var $el = $("#"+did);
+	//setando valores
+	
+	$('textarea[name="sysContratoEstado.motivo"]').attr("value",$("#estadoMotivo").attr("value"));
+	$('input[name="sysContratoEstado.data"]').attr("value",$("#estadoData").attr("value"));
+	$('input[name="sysContratoEstado.dias"]').attr("value",$("#estadoDias").attr("value"));
+	changeSelectEstadoNome($("#estadoID").attr("value"));
+	$('select[name="sysContratoEstado.nome"]').attr("value",$("#estadoID").attr("value"));
+	$el.dialog({
+		resizable: true,
+		modal: true,
+		autoOpen:true,
+		width:'350',
+		height:'300',
+		title:'Alterar Estado do Contrato: '+doc,
+		buttons: {
+			"Salvar": function() {
+				var estadoID = $("#sysContratoEstadoNome").attr("value");
+				var motivo = $('textarea[name="sysContratoEstado.motivo"]').attr("value");
+				motivo = motivo==""?0:motivo;
+				msgError="";
+				if($('textarea[name="sysContratoEstado.motivo"]').attr("enable").indexOf(estadoID)>=0){
+					if(!$('textarea[name="sysContratoEstado.motivo"]').verify("obrigatorio")){
+						msgError="Campos com * são obrigatórios.";
+					}
+				}
+				else if($('input[name="sysContratoEstado.dias"]').attr("enable").indexOf(estadoID)>=0){
+					if(!$('input[name="sysContratoEstado.dias"]').verify("obrigatorio")){
+						msgError="Campos com * são obrigatórios.";
+					}
+				}
+				var dias = $('input[name="sysContratoEstado.dias"]').attr("value");
+				if($('input[name="sysContratoEstado.dias"]').attr("enable").indexOf(estadoID)>=0){
+					if(!$('input[name="sysContratoEstado.dias"]').verify("obrigatorio")){
+						msgError="Campos com * são obrigatórios.";
+					}
+					else if(!$('input[name="sysContratoEstado.dias"]').verify("integer")){
+						msgError="Por favor, em Dias, utilize apenas números maiores que zero e inteiro. Exemplo: 10 ou 36";
+					}
+				}
+				if(msgError!=""){
+					alert(msgError);
+					return false;
+				}
+				var data = $('input[name="sysContratoEstado.data"]').attr("value");
+				data = data==""?0:data;
+				$.ajax({
+					  url: "contrato_estados.php",
+					  data:{editContratoEstado:true,
+						    sysContratoEstadoID:estadoID,
+						    docID:doc,
+						    motivo:motivo,
+						    dias:dias,
+						    data:data},
+					  cache: false,
+					  dataType: "json",
+					  success: function(data){
+						  location.reload(true);
+					  }
+				});
+				$( this ).dialog( "close" );
+			},
+			"Cancelar": function() {
+				$( this ).dialog( "close" );
+			}
+		}
+	});
+};
+function changeSelectEstadoNome(val){
+	$("#tableDaoInserirContratoEstado tbody tr").each(function(){
+		var en = $(this).attr("enable");
+		var change = false;
+		if(en!="" && en){
+			ven = en.split(",")
+			for(var i in ven){
+				if(val==ven[i]){
+					$(this).children('td').show();
+					$(this).show();
+					change=true;
+				}
+			}
+			if(!change){
+				$(this).hide();
+				$(this).children('td').children().attr("value","");
+			}
+		}
+	});
+}
+$(document).ready(function(){
+	//datepicker	
+	$('input[name="sysContratoEstado.data"]').datepicker();
+	var val;
+	$('#sysContratoEstadoNome').change(function(){
+		val = $(this).attr("value");
+		changeSelectEstadoNome(val);
+	});
+});
+
+//fim

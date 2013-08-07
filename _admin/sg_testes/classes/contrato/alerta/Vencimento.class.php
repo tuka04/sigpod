@@ -1,4 +1,12 @@
 <?php
+/**
+ * Vencimento
+ * @version 0.1 (29/6/2013)
+ * @package classes
+ * @subpackage contrato.alerta
+ * @author Leandro Kümmel Tria Mendes
+ * @desc classe q manipula o vencimento de um contrato
+ */
 require_once 'classes/contrato/interfaces/VencimentoIF.class.php';
 class Vencimento implements VencimentoIF {
 	/**

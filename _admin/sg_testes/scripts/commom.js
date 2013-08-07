@@ -36,7 +36,6 @@ function showInputFile(i){//mostra outro campo para anexo de arquivo
 	$("#fileUpCell").append('<br /><input type="file" id="arq'+i+'" name="arq'+i+'" onclick="showInputFile('+(i+1)+')" />');
 }
 
-
 /*function html_entity_decode(str) {
 	var ta=document.createElement("textarea");
 	ta.innerHTML=str.replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -968,7 +967,61 @@ function removerGerenciaAlertas(){
 		  }
 	});
 }
-
+//prototype
+String.prototype.isInteger = function(){
+	var exp = /^-?\d\d*$/;
+	return exp.test(this);
+}
+//funcoes comum jquery
+jQuery(function($){
+	//verifica o campo
+	$.fn.verify = function(type){
+		if(!$.isArray(type)){
+			t = new Array();
+			t.push(type);
+		}
+		else{
+			t = type;
+		}
+		for(var i in t){
+			type = t[i];
+			if(type=="obrigatorio"){
+				if($(this).attr("value")==""){
+					$(this).css("border-color","#be1010");
+					return false;
+				}
+			}
+			else if(type=="integer"){
+				if(!$(this).attr("value").isInteger()){
+					$(this).css("border-color","#be1010");
+					return false;
+				}
+			}
+		}
+		$(this).css("border-color","#000000");
+		return true;
+	}
+	//datepicker
+	$.datepicker.regional['pt-BR'] = {
+			closeText: 'Fechar',
+			prevText: '&#x3c;Anterior',
+			nextText: 'Pr&oacute;ximo&#x3e;',
+			currentText: 'Hoje',
+			monthNames: ['Janeiro','Fevereiro','Mar&ccedil;o','Abril','Maio','Junho',
+			'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+			monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun',
+			'Jul','Ago','Set','Out','Nov','Dez'],
+			dayNames: ['Domingo','Segunda-feira','Ter&ccedil;a-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sabado'],
+			dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'],
+			dayNamesMin: ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'],
+			weekHeader: 'Sm',
+			dateFormat: 'dd/mm/yy',
+			firstDay: 0,
+			isRTL: false,
+			showMonthAfterYear: false,
+			yearSuffix: ''};
+	$.datepicker.setDefaults($.datepicker.regional['pt-BR']);
+});
 
 //jquery.tablesorter.js
 (function($){$.extend({tablesorter:new

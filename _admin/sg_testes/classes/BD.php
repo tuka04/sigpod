@@ -5,8 +5,7 @@
 	 * @author Mario Akita
 	 * @desc lida com o requisicoes para o BD
 	 */
-require_once "BD/DAO/DAO.class.php";
-class BD {
+class BD extends GenericObj {
 	/**
 	 * string que contem o host
 	 * @var string
@@ -46,7 +45,8 @@ class BD {
 	 * @param string $table
 	 * @return variavel da conexao
 	 */
-	public function __construct($login = '', $password = '', $host = '', $table = '') {
+	public function __construct($login = '', $password = '', $host = '', $table = '', $campos=null) {
+		parent::__construct($campos);
 		global $conf;
 		
 		$this->host = $conf['DBhost'];
@@ -58,7 +58,11 @@ class BD {
 		$success = false;
 		
 		if($conf['debugMode']){ print "Selecionando BD"; }
-
+		global $bd;
+		if(is_object($bd)){
+			$this->conn = $bd->conn;
+			return;
+		}
 		if(@fsockopen($this->host['master'], $this->port, $erroNo, $erroMsg, 1)) {
 			$this->conn = mysql_connect($this->host['master'].':3306', $this->login, $this->password) or die("Impossivel conectar ao master: ".mysql_error()); 
 			if($this->conn) {
@@ -92,6 +96,7 @@ class BD {
 	 * @param string $sql
 	 */
 	private function checkToken($sql){
+		require_once "BD/DAO/DAO.class.php";
 		$sql = str_replace(DAO::TOKEN_CAMPOS, "", $sql);
 		$sql = str_replace(DAO::TOKEN_TABELA, "", $sql);
 		$sql = str_replace(DAO::TOKEN_WHERE, "", $sql);

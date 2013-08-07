@@ -64,5 +64,9 @@ class HtmlTagAttr implements HtmlTagAttrIF{
 		}
 		return $str;
 	}
+	
+	public function toArray(){
+		return $this->attr->getArrayCopy();
+	}
 }
 ?>

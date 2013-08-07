@@ -15,147 +15,22 @@ $bd = new BD($conf["DBLogin"], $conf["DBPassword"], $conf["DBhost"], $conf["DBTa
 if (isset($_GET['tipoBusca'])){//tipo de busca
 	//busca de campos
 	if(isset($_GET['docs']) && $_GET['tipoBusca'] == 'campoSearch'){
-		print '<table width="100%">';
-		if (!isset($_GET['mini']) || $_GET['mini'] != 'true') print '<tr><td width="50%">';
-		$camposPartes = '';
-		$_GET['docs'] = rtrim($_GET['docs'], ',');
-		$tipos = explode(',', $_GET['docs']);
-		if (count($tipos) == 0 || (count($tipos) == 1 && $tipos[0] == '')) {
-			print ('<b>Pelo menos um tipo de documento deve ser escolhido.</b>');
-			
-		} elseif (count($tipos) == 1) {
-			$doc = new Documento(0);
-			$doc->dadosTipo['nomeAbrv'] = $tipos[0];
-			$doc->loadTipoData();
-			$campos = explode(',',$doc->dadosTipo['campos']);
-			if (!isset($_GET['mini']) || $_GET['mini'] != 'true') print('<table width="100%">');
-			print ('<input type="hidden" id="tipos" value="'.$_GET['docs'].'" />
-			<tr class="c" width="40%"><td class="c" width="25%">N&deg; CPO:</td><td class="c" width="60%"><input id="numCPO" type="text" size="5" maxlength="5" /></td></tr>
-			<tr class="c"><td class="c" width="25%">N&deg; do documento: </td><td class="c"><input type="test" id="numDoc" size="10" maxlength="10" /><br /></td></tr>
-			<tr class="c"><td class="c" width="25%">Criado em/entre: </td><td class="c"><input id="dataCriacao1" type="text" size="15" maxlength="10" /> e <input id="dataCriacao2" type="text" size="15" maxlength="10" /</td></tr>
-			<tr class="c"><td class="c" width="25%">Despachado em/entre: </td><td class="c"><input id="dataDespacho1" type="text" size="15" maxlength="10" /> e <input id="dataDespacho2" type="text" size="15" maxlength="10" /></td></tr>
-			<tr class="c"><td class="c" width="25%">Despachado para: </td><td class="c"><input id="unDespacho" type="text" size="40" maxlength="250" /></td></tr>
-			<tr class="c"><td class="c" width="25%">Recebido em/entre: </td><td class="c"><input id="dataReceb1" type="text" size="15" maxlength="10" /> e <input id="dataReceb2" type="text" size="15" maxlength="10" /></td></tr>
-			<tr class="c"><td class="c" width="25%">Recebido de: </td><td class="c"><input id="unReceb" type="text" size="40" maxlength="250" /></td></tr>
-			<tr class="c"><td class="c" width="25%">Conte&uacute;do do despacho: </td><td class="c"><input id="contDesp" type="text" size="40" /></td></tr>
-			<tr class="c"><td class="c" width="25%">Conte&uacute;do de <b>qualquer</b> campo: </td><td class="c"><input type="text" id="contGen" size="40" /></td></tr>');
-			// verifica se o usuario tem permissao para realizar busca no arquivo
-			if (checkPermission(68)) {
-				print('<tr class="c"><td class="c" width="25%">Arquivado?: </td><td class="c"><input type="radio" id="buscaArquivo" name="buscaArquivo" value="1" /> Sim <input type="radio" id="buscaArquivo" name="buscaArquivo" value="0" /> N&atilde;o <input type="radio" id="buscaArquivo" name="buscaArquivo" value="-1" checked="checked" /> Ambos </td></tr>');
-			}
-			if (isset($_GET['anex']) && $_GET['anex'] == 'true') {
-				print('<tr class="c" style="Display:none"><td class="c" width="25%">A&ccedil;&atilde;o de anexar:</td><td class="c"><input type="radio" id="actionAnex" name="actionAnex" value="1"  checked="checked"/></td></tr>');
-			}
-			if (!isset($_GET['mini']) || $_GET['mini'] != 'true') print('</table></td><td width="50%"><table width="100%">');
-			foreach ($campos as $c) {
-				
-				$campoHtml = montaCampo($c,'bus');
-				 
-				$camposPartes .= $campoHtml['nome'] . ',';
-				
-				//if (stripos($campoHtml['nome'],"docsDesp") !== false || stripos($campoHtml['nome'],"docResp") !== false)
-					 //print ('<tr class="c" style="Display:none"><td class="c">'.$campoHtml['label'].':</td><td class="c">'.$campoHtml['cod'].'</td></tr>');//
-				/*else {
-					print ('<tr class="c"><td class="c">'.$campoHtml['label'].':</td><td class="c">'.$campoHtml['cod'].'</td></tr>');//
-				}*/
-				//print ('<tr class="c"><td class="c">'.$campoHtml['label'].':</td><td class="c">'.$campoHtml['cod'].'</td></tr>');//
-				if ($campoHtml['verAcao'] < 0 || ($campoHtml['verAcao'] > 0 && !checkPermission($campoHtml['verAcao'])))
-					continue;
-				elseif (stripos($campoHtml['nome'],"docResp") === false)
-					print ('<tr class="c"><td class="c" width="25%">'.$campoHtml['label'].':</td><td class="c">'.$campoHtml['cod'].'</td></tr>');
-			}
-			print('<input type="hidden" id="camposNomes" value="'.rtrim($camposPartes,",").'" />');
-			if (!isset($_GET['mini']) || $_GET['mini'] != 'true') print('</table></td></tr>');
-			print ('<tr><td colspan="2"><center><input type="submit" id="btnBuscar" value="Buscar" class="campoDoc" /></center></td></tr></table>');
-		} else {
-			$width = 'width="25%"';
-			if (!isset($_GET['mini']) || $_GET['mini'] != 'true') {
-				$width = "";
-				print('<table width="50%">');
-			}
-			print('
-			<input type="hidden" id="tipos" value="'.$_GET['docs'].'" />
-			<input type="hidden" id="camposNomes" value="" />
-			<tr class="c"><td class="c" '.$width.'>N&deg; CPO: </td><td class="c"><input id="numCPO" type="text" size="5" maxlength="5" /><br /></td></tr>
-			<tr class="c"><td class="c" '.$width.'>N&deg; do documento: </td><td class="c"><input type="test" id="numDoc" size="10" maxlength="10" /><br /></td></tr>
-			<tr class="c"><td class="c" '.$width.'>Criado em/entre: </td><td class="c"><input id="dataCriacao1" type="text" size="15" maxlength="10" /> e <input id="dataCriacao2" type="text" size="15" maxlength="10" /><br /></td></tr>
-			<tr class="c"><td class="c" '.$width.'>Despachado em: </td><td class="c"><input id="dataDespacho1" type="text" size="15" maxlength="10" /> e <input id="dataDespacho2" type="text" size="15" maxlength="10" /><br /></td></tr>
-			<tr class="c"><td class="c" '.$width.'>Despachado para: </td><td class="c"><input id="unDespacho" type="text" size="40" maxlength="250" /><br /></td></tr>
-			<tr class="c"><td class="c" '.$width.'>Recebido em/entre: </td><td class="c"><input id="dataReceb1" type="text" size="15" maxlength="10" /> e <input id="dataReceb2" type="text" size="15" maxlength="10" /><br /></td></tr>
-			<tr class="c"><td class="c" '.$width.'>Recebido de: </td><td class="c"><input id="unReceb" type="text" size="40" maxlength="250" /><br /></td></tr>
-			<tr class="c"><td class="c" '.$width.'>Conte&uacute;do do despacho: </td><td class="c"><input id="contDesp" type="text" size="40" /><br /></td></tr>
-			<tr class="c"><td class="c" '.$width.'>Conte&uacute;do de qualquer campo: </td><td class="c"><input type="text" id="contGen" size="40" /></td></tr>');
-			// verifica se o usuario tem permissao para realizar busca no arquivo
-			if (checkPermission(68)) {
-				print('<tr class="c"><td class="c" '.$width.'>Arquivado?: </td><td class="c"><input type="radio" id="buscaArquivo" name="buscaArquivo" value="1" /> Sim <input type="radio" id="buscaArquivo" name="buscaArquivo" value="0" /> N&atilde;o <input type="radio" id="buscaArquivo" name="buscaArquivo" value="-1" checked="checked" /> Ambos </td></tr>');
-			}
-			if (isset($_GET['anex']) && $_GET['anex'] == 'true') {
-				print('<tr class="c" style="Display:none"><td class="c" '.$width.'>A&ccedil;&atilde;o de anexar:</td><td class="c"><input type="radio" id="actionAnex" name="actionAnex" value="1"  checked="checked"/></td></tr>');
-			}
-			print('<tr><td colspan="2"><center><input type="submit" id="btnBuscar" value="Buscar" class="campoDoc" /></center></td></tr></table>');
-			if (!isset($_GET['mini']) || $_GET['mini'] != 'true') print('</table>');
-		}
-		exit();
+		require_once 'classes/busca/sgd/BuscaCampos.class.php';
+			$bc = new BuscaCampos();
+			echo $bc->getCampos()->toString();
+			exit();
 		
 	} elseif($_GET['tipoBusca'] == "busca") {
-		$valoresBusca = null;
-		$camposBuscaDesp = null;
-		$tiposDoc = null;
-		
-		//tratamento de acentos, etc
-		foreach ($_GET as $i => $g) {
-			$_GET[$i] = SGEncode(urldecode($g),ENT_QUOTES, null, false);
-		}
-		
-		//quais tipos de documento procurar?
-		foreach (explode(',',$_GET['tipoDoc']) as $tipo) {
-			$tp = getDocTipo($tipo);
-			if(count($tp)){
-				$tiposDoc[] = array('id' => $tp[0]['id'], 'nomeAbrv' => $tipo, 'tab' => $tp[0]['tabBD']);
-			}
-		}
-		
-		//dados de campos especificos
-		$campos = explode("|", $_GET['valoresBusca']);
-		//campos
-		foreach ($campos as $c) {
-			if($c != '') {
-				$dados = explode("=", $c);
-				$valoresBusca[$dados[0]] = $dados[1];
-			}  
-		}
-		
-		//montar consulta despacho
-		$resDesp = array();
-		foreach (array('dataDespacho', 'unDespacho', 'dataReceb', 'unReceb', 'contDesp') as $idx) {
-			if(isset($_GET[$idx]) && $_GET[$idx]){
-				if($idx == 'dataReceb1' || $idx == 'dataReceb2' ) {
-					$resDesp[$idx] = montaData($_GET['dataReceb1'], $_GET['dataReceb2']);
-				} elseif($idx == 'dataDespacho1' || $idx == 'dataDespacho2') {
-					$resDesp[$idx] = montaData($_GET['dataDespacho1'], $_GET['dataDespacho2']);
-				} else {
-					$resDesp[$idx] = $_GET[$idx];
-				}
-			}
-		}
-		
-		if (!isset($_GET['dataCriacao1'])) {
-			$_GET['dataCriacao1'] = null;
-		}
-		if (!isset($_GET['dataCriacao2'])) {
-			$_GET['dataCriacao2'] = null;
-		}
-		
-		
-		//montar consulta doc
-		$arquivado = "";
-		if (isset($_GET['arquivado'])) $arquivado = $_GET['arquivado'];
-		if ((isset($_GET['inicioRes'])) && (isset($_GET['numResult']))) { // verifica se as variaveis de paginacao estao setadas
-			$res = searchDoc($_GET['numCPO'],$_GET['numDoc'],montaData($_GET['dataCriacao1'], $_GET['dataCriacao2']), $tiposDoc, $valoresBusca, $resDesp, $_GET['contGen'], $arquivado, $_GET['anex'], $_GET['inicioRes'], $_GET['numResult']);
-		}		
-		else {
-			$res = searchDoc($_GET['numCPO'],$_GET['numDoc'],montaData($_GET['dataCriacao1'], $_GET['dataCriacao2']), $tiposDoc, $valoresBusca, $resDesp, $_GET['contGen'], $arquivado, $_GET['anex']);
-		}
+		require_once 'classes/busca/Busca.class.php';
+		$b = new Busca("busca");
+		$res = $b->run();
+	
+// 		if ((isset($_GET['inicioRes'])) && (isset($_GET['numResult']))) { // verifica se as variaveis de paginacao estao setadas
+// 			$res = searchDoc($_GET['numCPO'],$_GET['numDoc'],montaData($_GET['dataCriacao1'], $_GET['dataCriacao2']), $tiposDoc, $valoresBusca, $resDesp, $_GET['contGen'], $arquivado, $_GET['anex'], $_GET['inicioRes'], $_GET['numResult']);
+// 		}		
+// 		else {
+// 			$res = searchDoc($_GET['numCPO'],$_GET['numDoc'],montaData($_GET['dataCriacao1'], $_GET['dataCriacao2']), $tiposDoc, $valoresBusca, $resDesp, $_GET['contGen'], $arquivado, $_GET['anex']);
+// 		}
 		
 		//$condensedSearch = true;
 		
@@ -384,12 +259,23 @@ if (isset($_GET['tipoBusca'])){//tipo de busca
 
 // carrega todos os tipos de doc do bd e deixa em memória
 // a tabela é pequena, então guardar esta tabela em memória é vantajoso
+
 $docTypes = getAllDocTypes();
 $tipoDoc = array();
+
 foreach($docTypes as $dt) {
 	// cria array que representará a tabela
 	$tipoDoc[$dt['id']] = $dt;
 }
+//extrair ids
+$res_ids=new ArrayObj();
+foreach ($res as $r)
+	$res_ids->append($r["id"]);
+//fim da extracao
+//apenas 1 sql para os contratos
+$sql = "SELECT c.docID, o.id, o.nome FROM obra_obra AS o INNER JOIN obra_doc AS c ON o.id = c.obraID WHERE c.docID IN (".$res_ids->toString().");";
+
+$obras = $bd->query($sql);
 
 //conversao para JSON
 foreach ($res as $r) {
@@ -419,7 +305,6 @@ foreach ($res as $r) {
 		// seleciona todas as obras associadas a este contrato
 		$sql = "SELECT o.id, o.nome FROM obra_obra AS o INNER JOIN obra_doc AS c ON o.id = c.obraID WHERE c.docID = ".$r['id'];
 		$obras = $bd->query($sql);
-		
 		// inicializa variaveis
 		$d['data_contrato'] = array();
 		$d['data_contrato']['obras'] = array();
@@ -545,7 +430,8 @@ foreach ($res as $r) {
 		$empreend = $bd->query($sqlObra);
 	}
 	else {
-		$empreend = $doc->getEmpreend();
+		$empreend=null;
+// 		$empreend = $doc->getEmpreend();
 	}
 	$empreendList = array();
 	if ($empreend != null) {
@@ -639,6 +525,11 @@ foreach ($res as $r) {
 	
 	$data[] = $d;
 }
+// echo "<PRE>";
+// print_r($data);
+// echo "</PRE>";
+// die("asd");
+// die("asdsadsa");
 //fwrite($arqTeste, microtime(true));
 print json_encode($data);
 $bd->disconnect();

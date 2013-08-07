@@ -66,7 +66,7 @@ class AlertaDAO extends DAO{
 	 * Retorna um ArrayObject com a data de todos os contratos
 	 * @return ArrayObject
 	 */
-	public function getContratos(){
+	public function getContratos($termino=true){
 		//prepara query para selecionar TODOS os contratos
 		//a partir de 2013 apenas!!!
 		$qr = DAO::SELECT;
@@ -77,7 +77,9 @@ class AlertaDAO extends DAO{
 		//fazendo um LEFT JOIN das tabelas doc_contrato e doc
 		$join = " LEFT JOIN doc ON doc.id = doc_contrato.numProcContr LEFT JOIN doc_processo ON doc_processo.numero_pr = doc.numeroComp";
 		//selecionando a partir de 2013 apenas
-		$where = " WHERE YEAR(FROM_UNIXTIME(doc_contrato.dataTermino)) >= 2012";
+		$where ="";
+		if($termino)
+			$where = " WHERE YEAR(FROM_UNIXTIME(doc_contrato.dataTermino)) >= 2012";
 		$qr = str_replace(DAO::TOKEN_WHERE, $join.$where, $qr);	
 		//nda para order e limit
 		$qr = str_replace(DAO::TOKEN_ORDER, " ORDER BY doc_contrato.dataTermino DESC", $qr);

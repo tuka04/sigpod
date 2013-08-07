@@ -383,7 +383,7 @@
 			$dialog->setStyle("display", "none");
 			//campos para adicionar um novo alerta de sistema
 			$sa = new SysAlerta();
-			$dialog->setChildren(new HtmlTag("span", "respServerSysAlerta", "","",new HtmlTagStyle("font-color","red")));
+			$dialog->setChildren(new HtmlTag("span", "respServerSysAlerta", "","",new HtmlTagStyle(array("color","text-align","margin-left"),array("red","center","20%"))));
 			$dialog->setChildren($sa->getAddHtmlFields());
 			//dialog esta compreendido no campo alerta
 			$campoAlerta->setNext($dialog);
@@ -391,6 +391,26 @@
 			$campoAlerta = $campoAlerta->toString();
 		}
 		//fim 004
+		//solicitacao 005 : campo estado
+		$campoEstado="";
+		if($tipo=='contr'){
+			//submodulo
+			requireSubModule(array("frontend","contrato_estado"));
+			//campo alerta, link para gerenciar alertas (abrir dialog)
+			$campoEstado = new HtmlTag("a", "", "","Gerenciar Estados");
+			$campoEstado->setAttr(array("href","onclick"), array("#","javascript:gerenciarContratoEstado();"));			//preparando dialog para gerenciar alertas
+			$dialog = new HtmlTag("div", "dialogGerenciarEstado", "");
+			$dialog->setStyle("display", "none");
+			//campos para adicionar um novo alerta de sistema
+			$sa = new SysContratoEstado();
+			$dialog->setChildren(new HtmlTag("div", "respServerSysContratoEstado", "ui-state-error ui-corner-all","",new HtmlTagStyle(array("text-align","display"),array("center","none"))));
+			$dialog->setChildren($sa->getDAOHtml());
+			//dialog esta compreendido no campo alerta
+			$campoEstado->setNext($dialog);
+			//link campo alerta
+			$campoEstado = $campoEstado->toString();
+		}
+		//fim 005
 		//codigo HTML do formulario de edicao do tipo de documento
 		$html = '<script type="text/javascript" src="scripts/adm.js?r={$randNum}"></script>
 			<form accept-charset="'.$conf['charset'].'" action="adm.php?area=dc&amp;acao=salvar" method="post"><input type="hidden" name="action" value="'.$_GET['acao'].'" />
@@ -409,7 +429,11 @@
 					<tr>
 						<td><b>Alerta</b>:</td>
 						<td>'.$campoAlerta.'</td>
-					</tr>			
+					</tr>		
+					<tr>
+						<td><b>Estado</b>:</td>
+						<td>'.$campoEstado.'</td>
+					</tr>				
 					<tr>
 						<td><b>Campos:</b></td>
 						<td>

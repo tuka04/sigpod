@@ -210,7 +210,7 @@ $(document).ready(function(){
 
 	limpaCampos();
 	$.get("sgd_busca.php",{'tipoBusca':'cadSearch', "tabela": $("#tabBD").val(),"campos": $("#camposBusca").val(), "labelID": $("#labelID").val(), 'valores': escape(q) } ,function(d){//busca
-		alert('sd');
+		//alert('sd');
 		//alert(d);
 		//var data = eval(d);
 		try {
