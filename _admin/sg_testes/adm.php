@@ -988,11 +988,11 @@
 		//monta o codigo HTML do formulario de edicao
 		return '<form accept-charset="'.$conf['charset'].'" action="adm.php?area=em&amp;acao=salvar" method="post">
 		<table width="100%" border="0"> <input type="hidden" name="id" value="'.$id.'" />
-		<tr><td><b>Nome da Empresa:</b> <input id="nome" name="nome" value="'.$empr['nome'].'" size="50" /></td></tr>
-		<tr><td><b>EndereÃ§o:</b> <input id="end" name="end" value="'.$empr['end'].'" size="60" /></td></tr>
+		<tr><td><b>Nome da Empresa:</b> <input id="nome" name="nome" value="'.$empr['nome'].'" size="70" /></td></tr>
+		<tr><td><b>EndereÃ§o:</b> <input id="end" name="end" value="'.$empr['end'].'" size="79" /></td></tr>
 		<tr><td><b>Complemento:</b><input id="compl" name="compl" value="'.$empr['compl'].'" size="55"></td></tr>
-		<tr><td><b>Cidade:</b> <input id="cid" name="cid" size="22" value="'.$empr['cid'].'" /> <b>Estado:</b> <input id="est" name="est" size="2" value="'.$empr['est'].'" /> <b>CEP:</b> <input id="cep" name="cep" size="10" value="'.$empr['cep'].'" /></td></tr>
-		<tr><td><b>Telefone:</b> <input id="tel" name="tel" size="15" value="'.$empr['tel'].'" /> <b>e-mail:</b> <input id="email" name="email" size="30" value="'.$empr['email'].'" /></td></tr>
+		<tr><td><b>Cidade:</b> <input id="cid" name="cid" size="40" value="'.$empr['cid'].'" /> <b>Estado:</b> <input id="est" name="est" size="2" value="'.$empr['est'].'" /> <b>CEP:</b> <input id="cep" name="cep" size="10" value="'.$empr['cep'].'" /></td></tr>
+		<tr><td><b>Telefone:</b> <input id="tel" name="tel" size="15" value="'.$empr['tel'].'" /> <b>e-mail:</b> <input id="email" name="email" size="50" value="'.$empr['email'].'" /></td></tr>
 		<tr><td><center><input type="submit" value="Cadastrar" /></center></td></tr>
 		</table></form>';
 	}
