@@ -182,7 +182,6 @@ class html{
 		while(stripos($this->html,'{$content'.$nextContent.'}')!==false){
 			$this->html = str_replace('{$content'.$nextContent.'}', JS::generateJSTagHtml(JS::getHideElem("#c".$nextContent)), $this->html);
 			$nextContent++;
-				
 		}
 		print($this->html);
 	}
