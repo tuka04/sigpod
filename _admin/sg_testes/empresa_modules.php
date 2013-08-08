@@ -11,6 +11,8 @@ function showBuscaEmprForm(){
 /**
  * @deprecated
  */
+ 
+ // cria formulário de cadastro de empresa
 function showFormCadEmpr() {
 	return '
 	<b>Cadastrar Empresa:</b><br /><br />
