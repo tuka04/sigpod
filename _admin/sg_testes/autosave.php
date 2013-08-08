@@ -7,7 +7,7 @@
 
 	include_once('includeAll.php');
 	includeModule('sgo');
-
+//teste git
 	checkLogin(0);
 	
 	// tratamento de varivaveis POST
