@@ -6,7 +6,7 @@
 	
 	includeModule('sgo');
 	require_once 'classes/documento/tipo/DocumentoTipo.class.php';
-	
+//teste git	
 // 	$b = new Busca("busca");
 // 	$b->run();
 	die("asd");
